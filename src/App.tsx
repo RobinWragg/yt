@@ -1,26 +1,51 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import mockdatafile from "./mockdata.json";
+
+interface TableEntry {
+    "id": string,
+    "title": string,
+    "channel": string,
+    "date": string
+}
+
+const mockData: TableEntry[] = mockdatafile;
+
+const columns = [
+    { label: "Title", accessor: "title" },
+    { label: "Date", accessor: "date" },
+    { label: "Channel", accessor: "channel" },
+    { label: "ID", accessor: "id" }
+];
+
+function Table() {
+    return <table>
+        <thead>
+            <tr>
+                {columns.map(({ label, accessor }) => {
+                    return <th key={accessor}>{label}</th>;
+                })}
+            </tr>
+        </thead>
+        <tbody>
+            {mockData.map((entry) => {
+                return (
+                    <tr key={entry.id}>
+                        {columns.map(({ accessor }) => {
+                            const tEntry = entry[accessor as keyof TableEntry] ? entry[accessor as keyof TableEntry] : "?";
+                            return <td key={accessor}>{tEntry}</td>;
+                        })}
+                    </tr>
+                );
+            })}
+        </tbody>
+    </table>
+}
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Table />
+    );
 }
 
 export default App;
