@@ -44,10 +44,9 @@ function Table() {
                 return (
                     <tr key={entry.id}>
                         {columns.map(({ accessor }) => {
-                            const tEntry = entry[accessor as keyof TableEntry];
-                            return <td key={accessor}>{tEntry}</td>;
+                            return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
                         })}
-                        <td><button>👁️</button> <button>❌</button></td>
+                        <td><button title="Watch">👁️</button> <button title="Delete">❌</button></td>
                     </tr>
                 );
             })}
