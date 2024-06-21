@@ -9,7 +9,6 @@ interface TableEntry {
     "date": string
 }
 
-const mockData: TableEntry[] = mockdatafile;
 
 const columns = [
     { label: "Title", accessor: "title" },
@@ -19,6 +18,18 @@ const columns = [
 ];
 
 function Table() {
+    function compareEntries(a: TableEntry, b: TableEntry) {
+        if (a.title < b.title) {
+            return -1;
+        } else if (a.title > b.title) {
+            return 1;
+        }
+        return 0;
+    }
+
+    let mockData: TableEntry[] = mockdatafile;
+    mockData = mockData.sort(compareEntries);
+
     return <table>
         <thead>
             <tr>
