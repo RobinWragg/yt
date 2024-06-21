@@ -11,10 +11,10 @@ interface TableEntry {
 
 
 const columns = [
+    { label: "ID", accessor: "id" },
+    { label: "Channel", accessor: "channel" },
     { label: "Title", accessor: "title" },
     { label: "Date", accessor: "date" },
-    { label: "Channel", accessor: "channel" },
-    { label: "ID", accessor: "id" }
 ];
 
 function Table() {
@@ -36,6 +36,7 @@ function Table() {
                 {columns.map(({ label, accessor }) => {
                     return <th key={accessor}>{label}</th>;
                 })}
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -43,9 +44,10 @@ function Table() {
                 return (
                     <tr key={entry.id}>
                         {columns.map(({ accessor }) => {
-                            const tEntry = entry[accessor as keyof TableEntry] ? entry[accessor as keyof TableEntry] : "?";
+                            const tEntry = entry[accessor as keyof TableEntry];
                             return <td key={accessor}>{tEntry}</td>;
                         })}
+                        <td>yep</td>
                     </tr>
                 );
             })}
