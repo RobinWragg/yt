@@ -47,7 +47,7 @@ function Table() {
                             const tEntry = entry[accessor as keyof TableEntry];
                             return <td key={accessor}>{tEntry}</td>;
                         })}
-                        <td>yep</td>
+                        <td><button>👁️</button> <button>❌</button></td>
                     </tr>
                 );
             })}
