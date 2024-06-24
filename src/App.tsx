@@ -21,18 +21,8 @@ const columns = [
 function Table() {
     const [sortMode, setSortMode] = useState("");
 
-    function compareTitles(a: TableEntry, b: TableEntry) {
-        let compareResult = a.title.localeCompare(b.title);
-        if (compareResult > 0) {
-            return 1;
-        } else if (compareResult < 0) {
-            return -1;
-        }
-        return 0;
-    }
-
-    function compareChannels(a: TableEntry, b: TableEntry) {
-        let compareResult = a.channel.localeCompare(b.channel);
+    function compareEntries(a: TableEntry, b: TableEntry) {
+        let compareResult = a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
         if (compareResult > 0) {
             return 1;
         } else if (compareResult < 0) {
@@ -43,11 +33,8 @@ function Table() {
 
     let mockData: TableEntry[] = mockdatafile;
 
-    console.log(sortMode);
-    if (sortMode == "title") {
-        mockData = mockData.sort(compareTitles);
-    } else if (sortMode == "channel") {
-        mockData = mockData.sort(compareChannels);
+    if (sortMode !== "") {
+        mockData = mockData.sort(compareEntries);
     }
 
     return <table>
