@@ -36,6 +36,11 @@ function Table() {
         // TODO: I need to re-render now but not sure of the non-discouraged way to do it.
     }
 
+    function watchEntry(entryId: string) {
+        window.open("http://" + entryId);
+        deleteEntry(entryId);
+    }
+
     let mockData: TableEntry[] = mockdatafile;
 
     if (sortMode !== "") {
@@ -69,7 +74,7 @@ function Table() {
                             return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
                         })}
                         <td>
-                            <a href={"http://" + entry.id}><button title="Watch">👁️</button></a>
+                            <button title="Watch" onClick={() => watchEntry(entry.id)}>👁️</button>
                             &nbsp;
                             <button title="Delete" onClick={() => deleteEntry(entry.id)}>❌</button>
                         </td>
@@ -77,7 +82,7 @@ function Table() {
                 );
             })}
         </tbody>
-    </table>
+    </table >
 }
 
 function App() {
