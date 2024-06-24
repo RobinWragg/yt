@@ -19,7 +19,7 @@ const columns = [
 ];
 
 function Table() {
-    const [sortMode, setSortMode] = useState("");
+    const [sortMode, setSortMode] = useState("date");
     const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
 
     function onHeaderClick(accessor: string, previousSortOrder: boolean) {
