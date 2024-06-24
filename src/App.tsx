@@ -11,7 +11,6 @@ interface TableEntry {
     "date": string
 }
 
-
 const columns = [
     { label: "ID", accessor: "id" },
     { label: "Channel", accessor: "channel" },
@@ -21,32 +20,34 @@ const columns = [
 
 function Table() {
     const [sortMode, setSortMode] = useState("");
-    const [reverseSort, setReverseSort] = useState<boolean>(false);
+    const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
 
-    function onHeaderClick(accessor: string, reverseSort: boolean) {
-        setSortMode(accessor);
+    function onHeaderClick(accessor: string, previousSortOrder: boolean) {
         if (sortMode === accessor) {
-            setReverseSort(!reverseSort);
+            setReverseSortOrder(!previousSortOrder);
         } else {
-            setReverseSort(false);
+            setSortMode(accessor);
+            setReverseSortOrder(false);
         }
     }
 
-    function compareEntries(a: TableEntry, b: TableEntry) {
-        if (reverseSort) {
-            return b[sortMode as keyof TableEntry].localeCompare(a[sortMode as keyof TableEntry]);
-        } else {
-            return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
-        }
+    function deleteEntry(entryId: string) {
+        console.log("delete", entryId);
+        // TODO: I need to re-render now but not sure of the non-discouraged way to do it.
     }
 
     let mockData: TableEntry[] = mockdatafile;
 
     if (sortMode !== "") {
-        mockData = mockData.sort(compareEntries);
+        mockData = mockData.sort((a: TableEntry, b: TableEntry) => {
+            if (reverseSortOrder) {
+                [a, b] = [b, a];
+            }
+            return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
+        });
     }
 
-    const headerStyle: CSS.Properties = {
+    const thStyle: CSS.Properties = {
         cursor: "pointer",
         userSelect: "none",
     };
@@ -55,7 +56,7 @@ function Table() {
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {
-                    return <th onClick={() => onHeaderClick(accessor, reverseSort)} style={headerStyle} key={accessor}>{label}</th>;
+                    return <th onClick={() => onHeaderClick(accessor, reverseSortOrder)} style={thStyle} key={accessor}>{label}</th>;
                 })}
                 <th>Actions</th>
             </tr>
@@ -67,7 +68,11 @@ function Table() {
                         {columns.map(({ accessor }) => {
                             return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
                         })}
-                        <td><button title="Watch">👁️</button> <button title="Delete">❌</button></td>
+                        <td>
+                            <a href={"http://" + entry.id}><button title="Watch">👁️</button></a>
+                            &nbsp;
+                            <button title="Delete" onClick={() => deleteEntry(entry.id)}>❌</button>
+                        </td>
                     </tr>
                 );
             })}
