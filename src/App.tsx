@@ -22,13 +22,7 @@ function Table() {
     const [sortMode, setSortMode] = useState("");
 
     function compareEntries(a: TableEntry, b: TableEntry) {
-        let compareResult = a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
-        if (compareResult > 0) {
-            return 1;
-        } else if (compareResult < 0) {
-            return -1;
-        }
-        return 0;
+        return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
     }
 
     let mockData: TableEntry[] = mockdatafile;
