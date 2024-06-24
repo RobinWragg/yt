@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from "react";
 import './App.css';
 import mockdatafile from "./mockdata.json";
+import CSS from "csstype";
 
 interface TableEntry {
     "id": string,
@@ -45,11 +46,16 @@ function Table() {
         mockData = mockData.sort(compareEntries);
     }
 
+    const headerStyle: CSS.Properties = {
+        cursor: "pointer",
+        userSelect: "none",
+    };
+
     return <table>
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {
-                    return <th onClick={() => onHeaderClick(accessor, reverseSort)} key={accessor}>{label}</th>;
+                    return <th onClick={() => onHeaderClick(accessor, reverseSort)} style={headerStyle} key={accessor}>{label}</th>;
                 })}
                 <th>Actions</th>
             </tr>
