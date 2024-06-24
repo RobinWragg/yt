@@ -20,9 +20,23 @@ const columns = [
 
 function Table() {
     const [sortMode, setSortMode] = useState("");
+    const [reverseSort, setReverseSort] = useState<boolean>(false);
+
+    function onHeaderClick(accessor: string, reverseSort: boolean) {
+        setSortMode(accessor);
+        if (sortMode === accessor) {
+            setReverseSort(!reverseSort);
+        } else {
+            setReverseSort(false);
+        }
+    }
 
     function compareEntries(a: TableEntry, b: TableEntry) {
-        return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
+        if (reverseSort) {
+            return b[sortMode as keyof TableEntry].localeCompare(a[sortMode as keyof TableEntry]);
+        } else {
+            return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
+        }
     }
 
     let mockData: TableEntry[] = mockdatafile;
@@ -35,7 +49,7 @@ function Table() {
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {
-                    return <th onClick={() => setSortMode(accessor)} key={accessor}>{label}</th>;
+                    return <th onClick={() => onHeaderClick(accessor, reverseSort)} key={accessor}>{label}</th>;
                 })}
                 <th>Actions</th>
             </tr>
