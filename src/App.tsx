@@ -37,7 +37,7 @@ function Table() {
     }
 
     function watchEntry(entryId: string) {
-        window.open("http://" + entryId);
+        window.open("https://www.youtube.com/watch?v=" + entryId);
         deleteEntry(entryId);
     }
 
