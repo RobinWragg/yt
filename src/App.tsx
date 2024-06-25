@@ -18,7 +18,7 @@ const columns = [
     { label: "Date", accessor: "date" },
 ];
 
-function Table() {
+function App() {
     const [sortMode, setSortMode] = useState("date");
     const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
 
@@ -52,6 +52,8 @@ function Table() {
         });
     }
 
+    // TODO: center table
+
     const thStyle: CSS.Properties = {
         cursor: "pointer",
         userSelect: "none",
@@ -59,7 +61,7 @@ function Table() {
 
     function trStyle(rowIndex: number) {
         return {
-            backgroundColor: rowIndex % 2 === 0 ? "#ccc" : "#fff",
+            backgroundColor: rowIndex % 2 === 0 ? "#444" : "black",
         };
     }
 
@@ -76,7 +78,7 @@ function Table() {
         <tbody>
             {mockData.map((entry, rowIndex) => {
                 return (
-                    <tr style={trStyle(rowIndex)}>
+                    <tr key={entry.id} style={trStyle(rowIndex)}>
                         {columns.map(({ accessor }) => {
                             return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
                         })}
@@ -90,12 +92,6 @@ function Table() {
             })}
         </tbody>
     </table >
-}
-
-function App() {
-    return (
-        <Table />
-    );
 }
 
 export default App;
