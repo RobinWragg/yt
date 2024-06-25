@@ -11,9 +11,9 @@ interface TableEntry {
 
 const columns = [
     { label: "ID", accessor: "id" },
+    { label: "Date", accessor: "date" },
     { label: "Channel", accessor: "channel" },
     { label: "Title", accessor: "title" },
-    { label: "Date", accessor: "date" },
 ];
 
 export default function Home() {
