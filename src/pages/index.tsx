@@ -70,7 +70,6 @@ export default function Home() {
                 {columns.map(({ label, accessor }) => {
                     return <th onClick={() => onHeaderClick(accessor, reverseSortOrder)} style={thStyle} key={accessor}>{label}</th>;
                 })}
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -82,7 +81,6 @@ export default function Home() {
                         })}
                         <td>
                             <button title="Watch" onClick={() => watchEntry(entry.id)}>👁️</button>
-                            &nbsp;
                             <button title="Delete" onClick={() => deleteEntry(entry.id)}>❌</button>
                         </td>
                     </tr>
