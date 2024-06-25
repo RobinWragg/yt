@@ -57,7 +57,14 @@ function Table() {
         userSelect: "none",
     };
 
-    return <table>
+    function trStyle(rowIndex: number) {
+        return {
+            backgroundColor: rowIndex % 2 === 0 ? "#ccc" : "#fff",
+        };
+    }
+
+    // borderCollapse is needed to color rows correctly.
+    return <table style={{ borderCollapse: "collapse" }}>
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {
@@ -67,9 +74,9 @@ function Table() {
             </tr>
         </thead>
         <tbody>
-            {mockData.map((entry) => {
+            {mockData.map((entry, rowIndex) => {
                 return (
-                    <tr key={entry.id}>
+                    <tr style={trStyle(rowIndex)}>
                         {columns.map(({ accessor }) => {
                             return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
                         })}
