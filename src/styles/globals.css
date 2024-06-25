@@ -1,0 +1,13 @@
+body {
+  color: white;
+  background-color: black;
+  font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+  "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
+  "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+  font-size: 14pt;
+}
+
+button {
+  background-color: #444;
+  cursor: pointer;
+}

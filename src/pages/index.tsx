@@ -1,6 +1,4 @@
-import React from 'react';
 import { useState } from "react";
-import './App.css';
 import mockdatafile from "./mockdata.json";
 import CSS from "csstype";
 
@@ -18,7 +16,7 @@ const columns = [
     { label: "Date", accessor: "date" },
 ];
 
-function App() {
+export default function Home() {
     const [sortMode, setSortMode] = useState("date");
     const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
 
@@ -93,5 +91,3 @@ function App() {
         </tbody>
     </table >
 }
-
-export default App;
