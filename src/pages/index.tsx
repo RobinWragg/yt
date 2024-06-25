@@ -64,7 +64,7 @@ export default function Home() {
     }
 
     // borderCollapse is needed to color rows correctly.
-    return <table style={{ borderCollapse: "collapse" }}>
+    return <table style={{ borderCollapse: "collapse", margin: "auto" }}>
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {

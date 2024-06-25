@@ -1,20 +1,20 @@
 [
     {
         "id": "aaaaa",
-        "title": "1",
-        "channel": "channel1",
+        "title": "I am a title and I'm talking to you right now!",
+        "channel": "IAmChannel",
         "date": "2022-01-26"
     },
     {
         "id": "aaaaab",
-        "title": "12",
-        "channel": "channel1",
+        "title": "I am also a title but I'm somewhat less enthusiastic.",
+        "channel": "Channel2",
         "date": "2024-01-01"
     },
     {
         "id": "aaaaabc",
-        "title": "123",
-        "channel": "channel2",
+        "title": "Just ignore me, thanks.",
+        "channel": "ThingsAndStuff",
         "date": "2024-01-01"
     }
 ]
