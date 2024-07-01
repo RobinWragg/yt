@@ -137,21 +137,26 @@ fn crawler_loop() {
         futures::executor::block_on(connection_future).unwrap()
     };
 
+    let channels = ["tested"];
+
     loop {
-        let channel_id = "tested";
-        let videos = get_channel_videos(channel_id, &chrono::Utc::now()).unwrap();
+        for channel_id in channels {
+            if let Ok(videos) = get_channel_videos(channel_id, &chrono::Utc::now()) {
+                for video in videos {
+                    let query = sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4, $5);")
+                        .bind(&video.video_id)
+                        .bind(&video.channel_id)
+                        .bind(&video.title)
+                        .bind(&video.date)
+                        .bind(false)
+                        .execute(&mut connection);
 
-        for video in videos {
-            let query = sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4, $5);")
-                .bind(&video.video_id)
-                .bind(&video.channel_id)
-                .bind(&video.title)
-                .bind(&video.date)
-                .bind(false)
-                .execute(&mut connection);
-
-            if futures::executor::block_on(query).is_ok() {
-                println!("Inserted {} {}", video.channel_id, video.video_id);
+                    if futures::executor::block_on(query).is_ok() {
+                        println!("Inserted {} {}", video.channel_id, video.video_id);
+                    }
+                }
+            } else {
+                println!("Failed to crawl {}", channel_id);
             }
         }
 
