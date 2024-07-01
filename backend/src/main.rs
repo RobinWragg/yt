@@ -15,8 +15,15 @@ const SECONDS_PER_MONTH: u64 = SECONDS_PER_DAY * 30; // Approximate!
 const SECONDS_PER_YEAR: u64 = SECONDS_PER_DAY * 365; // Approximate!
 
 #[get("/")]
-async fn hello() -> impl Responder {
+async fn http_get_videos() -> impl Responder {
+    // todo
     HttpResponse::Ok().body("nibor!")
+}
+
+#[post("/watched")]
+async fn http_set_video_watched(req_body: String) -> impl Responder {
+    // todo
+    HttpResponse::Ok().body(req_body)
 }
 
 fn parse_recency(s: &str, now: &DateTime) -> Result<DateTime, Box<dyn Error>> {
@@ -171,9 +178,13 @@ async fn main() {
 
     std::thread::spawn(crawler_loop);
 
-    let f = HttpServer::new(|| App::new().service(hello))
-        .bind(("127.0.0.1", 8080))
-        .unwrap()
-        .run()
-        .await;
+    let f = HttpServer::new(|| {
+        App::new()
+            .service(http_get_videos)
+            .service(http_set_video_watched)
+    })
+    .bind(("127.0.0.1", 8080))
+    .unwrap()
+    .run()
+    .await;
 }
