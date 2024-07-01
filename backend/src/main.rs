@@ -131,17 +131,21 @@ fn main() {
 
     let mut connection = {
         let connection_future =
-            PgConnection::connect("postgres://user:password@localhost/postgres");
+            PgConnection::connect("postgres://postgres:password@localhost/postgres");
         futures::executor::block_on(connection_future).expect("failed to obtain db connection")
     };
 
     for v in a {
-        let query = sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4);")
-            .bind(&v.channel_id)
-            .bind(&v.video_id)
-            .bind(&v.title)
-            .bind(&v.date)
-            .execute(&mut connection);
-        let query = futures::executor::block_on(query).unwrap();
+        // Insert into the table, skipping on primary key conflicts (video_id).
+        let query =
+            sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING;")
+                .bind(&v.video_id)
+                .bind(&v.channel_id)
+                .bind(&v.title)
+                .bind(&v.date)
+                .bind(false)
+                .execute(&mut connection);
+
+        let _ = futures::executor::block_on(query).unwrap();
     }
 }
