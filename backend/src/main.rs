@@ -1,3 +1,4 @@
+use actix_web::*;
 use curl;
 use regex::Regex;
 use serde_json::Value as JsonValue;
@@ -6,18 +7,23 @@ use std::{error::Error, time::*};
 
 type DateTime = chrono::DateTime<chrono::Utc>;
 
+const SECONDS_PER_MINUTE: u64 = 60;
+const SECONDS_PER_HOUR: u64 = SECONDS_PER_MINUTE * 60;
+const SECONDS_PER_DAY: u64 = SECONDS_PER_HOUR * 24;
+const SECONDS_PER_WEEK: u64 = SECONDS_PER_DAY * 7;
+const SECONDS_PER_MONTH: u64 = SECONDS_PER_DAY * 30; // Approximate!
+const SECONDS_PER_YEAR: u64 = SECONDS_PER_DAY * 365; // Approximate!
+
+#[get("/")]
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("nibor!")
+}
+
 fn parse_recency(s: &str, now: &DateTime) -> Result<DateTime, Box<dyn Error>> {
     let re = Regex::new(r"(\d+) (\w+?)s? ago")?;
     let captures = re.captures(s).ok_or("captures() call failed")?;
 
     let base_number = captures[1].parse::<u64>()?;
-
-    const SECONDS_PER_MINUTE: u64 = 60;
-    const SECONDS_PER_HOUR: u64 = SECONDS_PER_MINUTE * 60;
-    const SECONDS_PER_DAY: u64 = SECONDS_PER_HOUR * 24;
-    const SECONDS_PER_WEEK: u64 = SECONDS_PER_DAY * 7;
-    const SECONDS_PER_MONTH: u64 = SECONDS_PER_DAY * 30; // Approximate!
-    const SECONDS_PER_YEAR: u64 = SECONDS_PER_DAY * 365; // Approximate!
 
     let seconds = match &captures[2] {
         "second" => base_number,
@@ -124,28 +130,45 @@ fn get_channel_videos(
     }
 }
 
-fn main() {
-    println!("Hello, world!");
-    let channel_id = "tested";
-    let a = get_channel_videos(channel_id, &chrono::Utc::now()).unwrap();
-
+fn crawler_loop() {
     let mut connection = {
         let connection_future =
             PgConnection::connect("postgres://postgres:password@localhost/postgres");
-        futures::executor::block_on(connection_future).expect("failed to obtain db connection")
+        futures::executor::block_on(connection_future).unwrap()
     };
 
-    for v in a {
-        // Insert into the table, skipping on primary key conflicts (video_id).
-        let query =
-            sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING;")
-                .bind(&v.video_id)
-                .bind(&v.channel_id)
-                .bind(&v.title)
-                .bind(&v.date)
+    loop {
+        let channel_id = "tested";
+        let videos = get_channel_videos(channel_id, &chrono::Utc::now()).unwrap();
+
+        for video in videos {
+            let query = sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4, $5);")
+                .bind(&video.video_id)
+                .bind(&video.channel_id)
+                .bind(&video.title)
+                .bind(&video.date)
                 .bind(false)
                 .execute(&mut connection);
 
-        let _ = futures::executor::block_on(query).unwrap();
+            if futures::executor::block_on(query).is_ok() {
+                println!("Inserted {} {}", video.channel_id, video.video_id);
+            }
+        }
+
+        println!("Sleeping");
+        std::thread::sleep(Duration::new(3, 0)); // todo: SECONDS_PER_DAY
     }
+}
+
+#[actix_web::main]
+async fn main() {
+    println!("Hello, world!");
+
+    std::thread::spawn(crawler_loop);
+
+    let f = HttpServer::new(|| App::new().service(hello))
+        .bind(("127.0.0.1", 8080))
+        .unwrap()
+        .run()
+        .await;
 }
