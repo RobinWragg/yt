@@ -21,8 +21,10 @@ async fn http_index() -> impl Responder {
 
 #[get("/unwatched_videos")]
 async fn http_get_unwatched_videos() -> impl Responder {
-    // todo
-    HttpResponse::Ok().body("video json!")
+    match database::select_unwatched_videos() {
+        Ok(v) => HttpResponse::Ok().body(v),
+        Err(e) => HttpResponse::NotFound().body(e.to_string()),
+    }
 }
 
 #[post("/set_video_watched")]
