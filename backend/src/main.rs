@@ -14,12 +14,18 @@ struct VideoDetails {
 }
 
 #[get("/")]
-async fn http_get_videos() -> impl Responder {
+async fn http_index() -> impl Responder {
     // todo
-    HttpResponse::Ok().body("nibor!")
+    HttpResponse::Ok().body("react index!")
 }
 
-#[post("/watched")]
+#[get("/unwatched_videos")]
+async fn http_get_unwatched_videos() -> impl Responder {
+    // todo
+    HttpResponse::Ok().body("video json!")
+}
+
+#[post("/set_video_watched")]
 async fn http_set_video_watched(req_body: String) -> impl Responder {
     // todo
     HttpResponse::Ok().body(req_body)
@@ -54,9 +60,10 @@ async fn main() {
 
     std::thread::spawn(crawler_loop);
 
-    let f = HttpServer::new(|| {
+    let _ = HttpServer::new(|| {
         App::new()
-            .service(http_get_videos)
+            .service(http_index)
+            .service(http_get_unwatched_videos)
             .service(http_set_video_watched)
     })
     .bind(("127.0.0.1", 8080))
