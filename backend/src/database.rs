@@ -1,13 +1,27 @@
-use sqlx::{postgres::PgConnection, Connection};
+use sqlx::{postgres::*, Connection, Row};
 use std::error::Error;
 
 use crate::VideoDetails;
 
 #[must_use]
-pub fn open_connection() -> PgConnection {
-    let connection_future =
-        PgConnection::connect("postgres://postgres:password@localhost/postgres");
-    futures::executor::block_on(connection_future).unwrap()
+pub fn select_unwatched_videos() -> Result<String, Box<dyn Error>> {
+    let mut connection = open_connection();
+
+    let query = sqlx::query(
+        "SELECT json_agg(json_build_object('video_id', video_id, 'channel_id', channel_id, 'title', title, 'published', published)) FROM videos WHERE watched=FALSE;",
+    )
+    .fetch_one(&mut connection);
+
+    match futures::executor::block_on(query) {
+        Ok(row) => {
+            let value = row.try_get_raw(0)?;
+            match value.as_str() {
+                Ok(v) => Ok(v.to_owned()),
+                Err(e) => Err(e.to_string().into()),
+            }
+        }
+        Err(e) => Err(e.into()),
+    }
 }
 
 #[must_use]
@@ -27,4 +41,11 @@ pub fn insert_video(video: &VideoDetails) -> Result<(), Box<dyn Error>> {
     } else {
         Ok(())
     }
+}
+
+#[must_use]
+fn open_connection() -> PgConnection {
+    let connection_future =
+        PgConnection::connect("postgres://postgres:password@localhost/postgres");
+    futures::executor::block_on(connection_future).unwrap()
 }
