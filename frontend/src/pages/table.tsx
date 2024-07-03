@@ -2,17 +2,18 @@ import { useState, useEffect } from "react";
 import mockdatafile from "./mockdata.json";
 import CSS from "csstype";
 
+// TODO: can i just use json instead of defining this?
 interface TableEntry {
-    "id": string,
-    "title": string,
-    "channel": string,
-    "published": string
+    video_id: string;
+    title: string;
+    channel_id: string;
+    published: string;
 }
 
 const columns = [
-    { label: "ID", accessor: "id" },
+    { label: "ID", accessor: "video_id" },
     { label: "Date", accessor: "published" },
-    { label: "Channel", accessor: "channel" },
+    { label: "Channel", accessor: "channel_id" },
     { label: "Title", accessor: "title" },
 ];
 
@@ -21,13 +22,17 @@ export default function Table() {
     const [sortMode, setSortMode] = useState("published"); // Sort by date published by default.
     const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
 
-    function refreshEntries() {
-        // Dummy API request to get unwatched videos. TODO
-        console.log("begin video get");
-        setTimeout(() => {
-            setEntries(mockdatafile);
-            console.log("end video get");
-        }, 1000);
+    async function refreshEntries() {
+        try {
+            const response = await fetch("http://127.0.0.1:8080/unwatched_videos");
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+
+            setEntries(await response.json());
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     // Request data to populate the table with.
@@ -45,7 +50,9 @@ export default function Table() {
         if (reverseSortOrder) {
             [a, b] = [b, a];
         }
-        return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
+        return a[sortMode as keyof TableEntry].localeCompare(
+            b[sortMode as keyof TableEntry]
+        );
     });
 
     // Make the column headers feel like buttons.
@@ -90,20 +97,28 @@ export default function Table() {
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {
-                    return <th onClick={() => onClickHeader(accessor, reverseSortOrder)} style={thStyle} key={accessor}>{label}</th>;
+                    return <th onClick={() => onClickHeader(accessor, reverseSortOrder)} style={thStyle} key={accessor}>
+                        {label}
+                    </th>;
                 })}
             </tr>
         </thead>
         <tbody>
             {sortedEntries.map((entry, rowIndex) => {
                 return (
-                    <tr key={entry.id} style={trStyle(rowIndex)}>
+                    <tr key={entry.video_id} style={trStyle(rowIndex)}>
                         {columns.map(({ accessor }) => {
-                            return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
+                            return <td key={accessor} style={{ "paddingRight": "10px" }}>
+                                {entry[accessor as keyof TableEntry]}
+                            </td>;
                         })}
                         <td>
-                            <button title="Watch" onClick={() => onClickWatch(entry.id)}>👁️</button>
-                            <button title="Delete" onClick={() => onClickDelete(entry.id)}>❌</button>
+                            <button title="Watch" onClick={() => onClickWatch(entry.video_id)}>
+                                👁️
+                            </button>
+                            <button title="Delete" onClick={() => onClickDelete(entry.video_id)}>
+                                ❌
+                            </button>
                         </td>
                     </tr>
                 );
