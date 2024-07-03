@@ -38,7 +38,7 @@ fn crawler_loop() {
                     }
                 }
             } else {
-                println!("Failed to crawl {}", channel_id);
+                println!("Failed to crawl {}", channel_id); // todo: print error
             }
         }
 

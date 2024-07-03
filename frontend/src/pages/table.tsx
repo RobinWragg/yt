@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import mockdatafile from "./mockdata.json";
 import CSS from "csstype";
 
@@ -6,21 +6,65 @@ interface TableEntry {
     "id": string,
     "title": string,
     "channel": string,
-    "date": string
+    "published": string
 }
 
 const columns = [
     { label: "ID", accessor: "id" },
-    { label: "Date", accessor: "date" },
+    { label: "Date", accessor: "published" },
     { label: "Channel", accessor: "channel" },
     { label: "Title", accessor: "title" },
 ];
 
 export default function Table() {
-    const [sortMode, setSortMode] = useState("date");
+    const [entries, setEntries] = useState<TableEntry[]>([]);
+    const [sortMode, setSortMode] = useState("published"); // Sort by date published by default.
     const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
 
-    function onHeaderClick(accessor: string, previousSortOrder: boolean) {
+    function refreshEntries() {
+        // Dummy API request to get unwatched videos. TODO
+        console.log("begin video get");
+        setTimeout(() => {
+            setEntries(mockdatafile);
+            console.log("end video get");
+        }, 1000);
+    }
+
+    // Request data to populate the table with.
+    useEffect(() => {
+        refreshEntries();
+    }, []);
+
+    // Don't render if there's no data to display.
+    if (entries.length === 0) {
+        return null;
+    }
+
+    // Sort entries (see onClickHeader)
+    let sortedEntries = entries.sort((a: TableEntry, b: TableEntry) => {
+        if (reverseSortOrder) {
+            [a, b] = [b, a];
+        }
+        return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
+    });
+
+    // Make the column headers feel like buttons.
+    const thStyle: CSS.Properties = {
+        cursor: "pointer",
+        userSelect: "none",
+    };
+
+    // Implement alternating row colors.
+    function trStyle(rowIndex: number) {
+        return {
+            backgroundColor: rowIndex % 2 === 0 ? "#444" : "black",
+        };
+    }
+
+    //
+    // Handle user input in these functions.
+    //
+    function onClickHeader(accessor: string, previousSortOrder: boolean) {
         if (sortMode === accessor) {
             setReverseSortOrder(!previousSortOrder);
         } else {
@@ -28,37 +72,17 @@ export default function Table() {
             setReverseSortOrder(false);
         }
     }
-
-    function deleteEntry(entryId: string) {
-        console.log("delete", entryId);
-        // TODO: I need to re-render now but not sure of the non-discouraged way to do it.
+    function onClickDelete(entryId: string) {
+        // Dummy API request to delete video. TODO
+        console.log("begin video delete", entryId);
+        setTimeout(() => {
+            console.log("end video delete");
+            refreshEntries();
+        }, 1000);
     }
-
-    function watchEntry(entryId: string) {
+    function onClickWatch(entryId: string) {
         window.open("https://www.youtube.com/watch?v=" + entryId);
-        deleteEntry(entryId);
-    }
-
-    let mockData: TableEntry[] = mockdatafile;
-
-    if (sortMode !== "") {
-        mockData = mockData.sort((a: TableEntry, b: TableEntry) => {
-            if (reverseSortOrder) {
-                [a, b] = [b, a];
-            }
-            return a[sortMode as keyof TableEntry].localeCompare(b[sortMode as keyof TableEntry]);
-        });
-    }
-
-    const thStyle: CSS.Properties = {
-        cursor: "pointer",
-        userSelect: "none",
-    };
-
-    function trStyle(rowIndex: number) {
-        return {
-            backgroundColor: rowIndex % 2 === 0 ? "#444" : "black",
-        };
+        onClickDelete(entryId);
     }
 
     // borderCollapse is needed to color rows correctly.
@@ -66,20 +90,20 @@ export default function Table() {
         <thead>
             <tr>
                 {columns.map(({ label, accessor }) => {
-                    return <th onClick={() => onHeaderClick(accessor, reverseSortOrder)} style={thStyle} key={accessor}>{label}</th>;
+                    return <th onClick={() => onClickHeader(accessor, reverseSortOrder)} style={thStyle} key={accessor}>{label}</th>;
                 })}
             </tr>
         </thead>
         <tbody>
-            {mockData.map((entry, rowIndex) => {
+            {sortedEntries.map((entry, rowIndex) => {
                 return (
                     <tr key={entry.id} style={trStyle(rowIndex)}>
                         {columns.map(({ accessor }) => {
                             return <td key={accessor}>{entry[accessor as keyof TableEntry]}</td>;
                         })}
                         <td>
-                            <button title="Watch" onClick={() => watchEntry(entry.id)}>👁️</button>
-                            <button title="Delete" onClick={() => deleteEntry(entry.id)}>❌</button>
+                            <button title="Watch" onClick={() => onClickWatch(entry.id)}>👁️</button>
+                            <button title="Delete" onClick={() => onClickDelete(entry.id)}>❌</button>
                         </td>
                     </tr>
                 );
