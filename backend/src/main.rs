@@ -34,7 +34,7 @@ async fn http_set_video_watched(req_body: String) -> impl Responder {
 }
 
 fn crawler_loop() {
-    let channels = ["tested"];
+    let channels = ["tested", "AdamNeely", "GameGrumps", "TheGlassCannon"];
 
     loop {
         for channel_id in channels {
@@ -52,7 +52,7 @@ fn crawler_loop() {
 
         println!("Sleeping");
 
-        std::thread::sleep(Duration::from_secs(3)); // todo: SECONDS_PER_DAY
+        std::thread::sleep(Duration::from_secs(30)); // todo: SECONDS_PER_DAY
     }
 }
 
