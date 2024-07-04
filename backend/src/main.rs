@@ -1,3 +1,4 @@
+use actix_files::Files;
 use actix_web::*;
 use std::time::Duration;
 mod crawler;
@@ -13,13 +14,7 @@ struct VideoDetails {
     date: DateTime,
 }
 
-#[get("/")]
-async fn http_index() -> impl Responder {
-    // todo
-    HttpResponse::Ok().body("react index!")
-}
-
-#[get("/unwatched_videos")]
+#[get("api/unwatched_videos")]
 async fn http_get_unwatched_videos() -> impl Responder {
     match database::select_unwatched_videos() {
         Ok(v) => HttpResponse::Ok().body(v),
@@ -27,7 +22,7 @@ async fn http_get_unwatched_videos() -> impl Responder {
     }
 }
 
-#[post("/set_video_watched")]
+#[post("api/set_video_watched")]
 async fn http_set_video_watched(req_body: String) -> impl Responder {
     // todo
     HttpResponse::Ok().body(req_body)
@@ -63,10 +58,15 @@ async fn main() {
     std::thread::spawn(crawler_loop);
 
     let _ = HttpServer::new(|| {
+        // NOTE: Here, the API services need to be before the Files::new service.
         App::new()
-            .service(http_index)
             .service(http_get_unwatched_videos)
             .service(http_set_video_watched)
+            .service(
+                Files::new("/", "../frontend/out/")
+                    .index_file("index.html")
+                    .show_files_listing(),
+            )
     })
     .bind(("127.0.0.1", 8080))
     .unwrap()

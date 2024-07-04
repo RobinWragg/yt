@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import mockdatafile from "./mockdata.json";
 import CSS from "csstype";
 
 // TODO: can i just use json instead of defining this?
@@ -24,7 +23,7 @@ export default function Table() {
 
     async function refreshEntries() {
         try {
-            const response = await fetch("http://127.0.0.1:8080/unwatched_videos");
+            const response = await fetch("http://127.0.0.1:8080/api/unwatched_videos");
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
             }
