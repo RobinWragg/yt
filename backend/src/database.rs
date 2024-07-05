@@ -46,6 +46,6 @@ pub fn insert_video(video: &VideoDetails) -> Result<(), Box<dyn Error>> {
 #[must_use]
 fn open_connection() -> PgConnection {
     let connection_future =
-        PgConnection::connect("postgres://postgres:password@localhost/postgres");
+        PgConnection::connect("postgres://postgres:postgres@localhost/postgres");
     futures::executor::block_on(connection_future).unwrap()
 }
