@@ -36,8 +36,11 @@ fn crawler_loop() {
             if let Ok(videos) = crawler::get_channel_videos(channel_id) {
                 for video in videos {
                     // It's fine for this to fail if the video is already in the database.
-                    if database::insert_video(&video).is_ok() {
+                    let insert_result = database::insert_video(&video);
+                    if insert_result.is_ok() {
                         println!("Inserted {} {}", video.channel_id, video.video_id);
+                    } else {
+                        println!("Didn't insert because: {}", insert_result.err().unwrap());
                     }
                 }
             } else {
