@@ -14,6 +14,9 @@ pub fn get_channel_videos(channel_id: &str) -> Result<Vec<VideoDetails>, Box<dyn
     let mut dst = Vec::new();
     {
         easy_curl.url(&url)?;
+        let mut headers = curl::easy::List::new();
+        headers.append("Accept-Language: en")?;
+        easy_curl.http_headers(headers)?;
         let mut transfer = easy_curl.transfer();
         transfer.write_function(|data| {
             dst.extend_from_slice(data);
