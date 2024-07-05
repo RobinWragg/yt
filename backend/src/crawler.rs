@@ -97,7 +97,9 @@ fn parse_recency(s: &str, now: &DateTime) -> Result<DateTime, Box<dyn Error>> {
     const SECONDS_PER_YEAR: u64 = SECONDS_PER_DAY * 365; // Approximate!
 
     let re = Regex::new(r"(\d+) (\w+?)s? ago")?;
-    let captures = re.captures(s).ok_or("captures() call failed")?;
+    let captures = re
+        .captures(s)
+        .ok_or(format!("captures() call failed on str: {s}"))?;
 
     let base_number = captures[1].parse::<u64>()?;
 
