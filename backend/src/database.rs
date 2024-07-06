@@ -56,6 +56,21 @@ pub fn insert_video(video: &VideoDetails) -> Result<(), InsertError> {
 }
 
 #[must_use]
+pub fn select_all_channel_ids() -> Result<Vec<String>, Box<dyn Error>> {
+    let mut connection = open_connection();
+
+    let query = sqlx::query("SELECT channel_id FROM channels;").fetch_all(&mut connection);
+
+    match futures::executor::block_on(query) {
+        Ok(row) => {
+            let strings: Vec<String> = row.iter().map(|row| row.get(0)).collect();
+            Ok(strings)
+        }
+        Err(e) => Err(e.into()),
+    }
+}
+
+#[must_use]
 fn open_connection() -> PgConnection {
     let connection_future =
         PgConnection::connect("postgres://postgres:postgres@localhost/postgres");

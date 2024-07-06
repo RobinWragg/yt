@@ -30,11 +30,11 @@ async fn http_set_video_watched(req_body: String) -> impl Responder {
 }
 
 fn crawler_loop() {
-    let channels = ["tested", "AdamNeely", "GameGrumps", "TheGlassCannon"];
+    let channels = database::select_all_channel_ids().expect("Can't get channels");
 
     loop {
-        for channel_id in channels {
-            match crawler::get_channel_videos(channel_id) {
+        for channel_id in &channels {
+            match crawler::get_channel_videos(&channel_id) {
                 Ok(videos) => {
                     for video in videos {
                         // It's fine for this to fail if the video is already in the database.
