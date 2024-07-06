@@ -120,6 +120,7 @@ fn parse_recency(s: &str, now: &DateTime) -> Result<DateTime, Box<dyn Error>> {
     Ok(*now - Duration::from_secs(seconds))
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
