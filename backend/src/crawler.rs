@@ -119,3 +119,15 @@ fn parse_recency(s: &str, now: &DateTime) -> Result<DateTime, Box<dyn Error>> {
 
     Ok(*now - Duration::from_secs(seconds))
 }
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_video() {
+        let s = std::fs::read_to_string("test_files/get_video_common.json").unwrap();
+        let json: serde_json::Value = serde_json::from_str(&s).unwrap();
+        let now = chrono::Utc::now();
+        get_video("mychannel", &json, &now).unwrap();
+    }
+}

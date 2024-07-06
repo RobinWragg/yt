@@ -1,0 +1,361 @@
+{
+    "descriptionSnippet": {
+        "runs": [
+            {
+                "text": "Are there any “someday builds” that Adam Savage would love to do? What's the status with the conversion of his 1982 Land Cruiser into an electric vehicle? How does Adam deal with being..."
+            }
+        ]
+    },
+    "lengthText": {
+        "accessibility": {
+            "accessibilityData": {
+                "label": "10 minutes, 10 seconds"
+            }
+        },
+        "simpleText": "10:10"
+    },
+    "menu": {
+        "menuRenderer": {
+            "accessibility": {
+                "accessibilityData": {
+                    "label": "Action menu"
+                }
+            },
+            "items": [
+                {
+                    "menuServiceItemRenderer": {
+                        "icon": {
+                            "iconType": "ADD_TO_QUEUE_TAIL"
+                        },
+                        "serviceEndpoint": {
+                            "clickTrackingParams": "COABEP6YBBgGIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                            "commandMetadata": {
+                                "webCommandMetadata": {
+                                    "sendPost": true
+                                }
+                            },
+                            "signalServiceEndpoint": {
+                                "actions": [
+                                    {
+                                        "addToPlaylistCommand": {
+                                            "listType": "PLAYLIST_EDIT_LIST_TYPE_QUEUE",
+                                            "onCreateListCommand": {
+                                                "clickTrackingParams": "COABEP6YBBgGIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                                                "commandMetadata": {
+                                                    "webCommandMetadata": {
+                                                        "apiUrl": "/youtubei/v1/playlist/create",
+                                                        "sendPost": true
+                                                    }
+                                                },
+                                                "createPlaylistServiceEndpoint": {
+                                                    "params": "CAQ%3D",
+                                                    "videoIds": [
+                                                        "PdLPr9ak_7Y"
+                                                    ]
+                                                }
+                                            },
+                                            "openMiniplayer": true,
+                                            "videoId": "PdLPr9ak_7Y",
+                                            "videoIds": [
+                                                "PdLPr9ak_7Y"
+                                            ]
+                                        },
+                                        "clickTrackingParams": "COABEP6YBBgGIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+                                    }
+                                ],
+                                "signal": "CLIENT_SIGNAL"
+                            }
+                        },
+                        "text": {
+                            "runs": [
+                                {
+                                    "text": "Add to queue"
+                                }
+                            ]
+                        },
+                        "trackingParams": "COABEP6YBBgGIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+                    }
+                },
+                {
+                    "menuServiceItemRenderer": {
+                        "icon": {
+                            "iconType": "SHARE"
+                        },
+                        "serviceEndpoint": {
+                            "clickTrackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                            "commandMetadata": {
+                                "webCommandMetadata": {
+                                    "apiUrl": "/youtubei/v1/share/get_share_panel",
+                                    "sendPost": true
+                                }
+                            },
+                            "shareEntityServiceEndpoint": {
+                                "commands": [
+                                    {
+                                        "clickTrackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                                        "openPopupAction": {
+                                            "beReused": true,
+                                            "popup": {
+                                                "unifiedSharePanelRenderer": {
+                                                    "showLoadingSpinner": true,
+                                                    "trackingParams": "CN8BEI5iIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+                                                }
+                                            },
+                                            "popupType": "DIALOG"
+                                        }
+                                    }
+                                ],
+                                "serializedShareEntity": "CgtQZExQcjlha183WQ%3D%3D"
+                            }
+                        },
+                        "text": {
+                            "runs": [
+                                {
+                                    "text": "Share"
+                                }
+                            ]
+                        },
+                        "trackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+                    }
+                }
+            ],
+            "trackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+        }
+    },
+    "navigationEndpoint": {
+        "clickTrackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2WhhVQ2lESnRKS01JQ3BiOUIxcWY3cWpFT0GaAQMQ8jg=",
+        "commandMetadata": {
+            "webCommandMetadata": {
+                "rootVe": 3832,
+                "url": "/watch?v=PdLPr9ak_7Y",
+                "webPageType": "WEB_PAGE_TYPE_WATCH"
+            }
+        },
+        "watchEndpoint": {
+            "videoId": "PdLPr9ak_7Y",
+            "watchEndpointSupportedOnesieConfig": {
+                "html5PlaybackOnesieConfig": {
+                    "commonConfig": {
+                        "url": "https://rr1---sn-cu-nuoz.googlevideo.com/initplayback?source=youtube&oeis=1&c=WEB&oad=3200&ovd=3200&oaad=11000&oavd=11000&ocs=700&oewis=1&oputc=1&ofpcc=1&msp=1&odepv=1&id=3dd2cfafd6a4ffb6&ip=91.125.138.60&initcwndbps=1753750&mt=1720293221&oweuc=&pxtags=Cg4KAnR4Egg1MTA2NjExOA&rxtags=Cg4KAnR4Egg1MTA2NjExNg%2CCg4KAnR4Egg1MTA2NjExNw%2CCg4KAnR4Egg1MTA2NjExOA%2CCg4KAnR4Egg1MTA2NjExOQ%2CCg4KAnR4Egg1MTA2NjEyMA%2CCg4KAnR4Egg1MTA2NjEyMQ"
+                    }
+                }
+            }
+        }
+    },
+    "ownerBadges": [
+        {
+            "metadataBadgeRenderer": {
+                "accessibilityData": {
+                    "label": "Verified"
+                },
+                "icon": {
+                    "iconType": "CHECK_CIRCLE_THICK"
+                },
+                "style": "BADGE_STYLE_TYPE_VERIFIED",
+                "tooltip": "Verified",
+                "trackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+            }
+        }
+    ],
+    "publishedTimeText": {
+        "simpleText": "5 hours ago"
+    },
+    "shortViewCountText": {
+        "accessibility": {
+            "accessibilityData": {
+                "label": "13K views"
+            }
+        },
+        "simpleText": "13K views"
+    },
+    "showActionMenu": false,
+    "thumbnail": {
+        "thumbnails": [
+            {
+                "height": 94,
+                "url": "https://i9.ytimg.com/vi/PdLPr9ak_7Y/hqdefault_custom_3.jpg?sqp=COCxprQG-oaymwE8CKgBEF5IWvKriqkDLwgBFQAAAAAYASUAAMhCPQCAokN4AfABAfgB_gmAAtAFigIMCAAQARhPIFYoZTAP&rs=AOn4CLCEGaPaMSZAT0sN7aOsaL5d9bRqOQ",
+                "width": 168
+            },
+            {
+                "height": 110,
+                "url": "https://i9.ytimg.com/vi/PdLPr9ak_7Y/hqdefault_custom_3.jpg?sqp=COCxprQG-oaymwE8CMQBEG5IWvKriqkDLwgBFQAAAAAYASUAAMhCPQCAokN4AfABAfgB_gmAAtAFigIMCAAQARhPIFYoZTAP&rs=AOn4CLBS4D-ItbMq968ypufnU_7au4M-Aw",
+                "width": 196
+            },
+            {
+                "height": 138,
+                "url": "https://i9.ytimg.com/vi/PdLPr9ak_7Y/hqdefault_custom_3.jpg?sqp=COCxprQG-oaymwE9CPYBEIoBSFryq4qpAy8IARUAAAAAGAElAADIQj0AgKJDeAHwAQH4Af4JgALQBYoCDAgAEAEYTyBWKGUwDw==&rs=AOn4CLAgtJ2PlhN4_6FC5FGotjS5jHNh4A",
+                "width": 246
+            },
+            {
+                "height": 188,
+                "url": "https://i9.ytimg.com/vi/PdLPr9ak_7Y/hqdefault_custom_3.jpg?sqp=COCxprQG-oaymwE9CNACELwBSFryq4qpAy8IARUAAAAAGAElAADIQj0AgKJDeAHwAQH4Af4JgALQBYoCDAgAEAEYTyBWKGUwDw==&rs=AOn4CLCc7oNONB9ztaeXfyCVDatZKHl2qg",
+                "width": 336
+            }
+        ]
+    },
+    "thumbnailOverlays": [
+        {
+            "thumbnailOverlayTimeStatusRenderer": {
+                "style": "DEFAULT",
+                "text": {
+                    "accessibility": {
+                        "accessibilityData": {
+                            "label": "10 minutes, 10 seconds"
+                        }
+                    },
+                    "simpleText": "10:10"
+                }
+            }
+        },
+        {
+            "thumbnailOverlayToggleButtonRenderer": {
+                "isToggled": false,
+                "toggledAccessibility": {
+                    "accessibilityData": {
+                        "label": "Added"
+                    }
+                },
+                "toggledIcon": {
+                    "iconType": "CHECK"
+                },
+                "toggledServiceEndpoint": {
+                    "clickTrackingParams": "CN4BEPnnAxgCIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                    "commandMetadata": {
+                        "webCommandMetadata": {
+                            "apiUrl": "/youtubei/v1/browse/edit_playlist",
+                            "sendPost": true
+                        }
+                    },
+                    "playlistEditEndpoint": {
+                        "actions": [
+                            {
+                                "action": "ACTION_REMOVE_VIDEO_BY_VIDEO_ID",
+                                "removedVideoId": "PdLPr9ak_7Y"
+                            }
+                        ],
+                        "playlistId": "WL"
+                    }
+                },
+                "toggledTooltip": "Added",
+                "trackingParams": "CN4BEPnnAxgCIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                "untoggledAccessibility": {
+                    "accessibilityData": {
+                        "label": "Watch later"
+                    }
+                },
+                "untoggledIcon": {
+                    "iconType": "WATCH_LATER"
+                },
+                "untoggledServiceEndpoint": {
+                    "clickTrackingParams": "CN4BEPnnAxgCIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                    "commandMetadata": {
+                        "webCommandMetadata": {
+                            "apiUrl": "/youtubei/v1/browse/edit_playlist",
+                            "sendPost": true
+                        }
+                    },
+                    "playlistEditEndpoint": {
+                        "actions": [
+                            {
+                                "action": "ACTION_ADD_VIDEO",
+                                "addedVideoId": "PdLPr9ak_7Y"
+                            }
+                        ],
+                        "playlistId": "WL"
+                    }
+                },
+                "untoggledTooltip": "Watch later"
+            }
+        },
+        {
+            "thumbnailOverlayToggleButtonRenderer": {
+                "toggledAccessibility": {
+                    "accessibilityData": {
+                        "label": "Added"
+                    }
+                },
+                "toggledIcon": {
+                    "iconType": "PLAYLIST_ADD_CHECK"
+                },
+                "toggledTooltip": "Added",
+                "trackingParams": "CN0BEMfsBBgDIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                "untoggledAccessibility": {
+                    "accessibilityData": {
+                        "label": "Add to queue"
+                    }
+                },
+                "untoggledIcon": {
+                    "iconType": "ADD_TO_QUEUE_TAIL"
+                },
+                "untoggledServiceEndpoint": {
+                    "clickTrackingParams": "CN0BEMfsBBgDIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                    "commandMetadata": {
+                        "webCommandMetadata": {
+                            "sendPost": true
+                        }
+                    },
+                    "signalServiceEndpoint": {
+                        "actions": [
+                            {
+                                "addToPlaylistCommand": {
+                                    "listType": "PLAYLIST_EDIT_LIST_TYPE_QUEUE",
+                                    "onCreateListCommand": {
+                                        "clickTrackingParams": "CN0BEMfsBBgDIhMIpMXxlZGThwMVDiEGAB0_JAk2",
+                                        "commandMetadata": {
+                                            "webCommandMetadata": {
+                                                "apiUrl": "/youtubei/v1/playlist/create",
+                                                "sendPost": true
+                                            }
+                                        },
+                                        "createPlaylistServiceEndpoint": {
+                                            "params": "CAQ%3D",
+                                            "videoIds": [
+                                                "PdLPr9ak_7Y"
+                                            ]
+                                        }
+                                    },
+                                    "openMiniplayer": true,
+                                    "videoId": "PdLPr9ak_7Y",
+                                    "videoIds": [
+                                        "PdLPr9ak_7Y"
+                                    ]
+                                },
+                                "clickTrackingParams": "CN0BEMfsBBgDIhMIpMXxlZGThwMVDiEGAB0_JAk2"
+                            }
+                        ],
+                        "signal": "CLIENT_SIGNAL"
+                    }
+                },
+                "untoggledTooltip": "Add to queue"
+            }
+        },
+        {
+            "thumbnailOverlayNowPlayingRenderer": {
+                "text": {
+                    "runs": [
+                        {
+                            "text": "Now playing"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "title": {
+        "accessibility": {
+            "accessibilityData": {
+                "label": "Adam Savage's Furry Ride or Die by Adam Savage’s Tested 13,700 views 5 hours ago 10 minutes, 10 seconds"
+            }
+        },
+        "runs": [
+            {
+                "text": "Adam Savage's Furry Ride or Die"
+            }
+        ]
+    },
+    "trackingParams": "CNwBENwwIhMIpMXxlZGThwMVDiEGAB0_JAk2QLb_k7X99bPpPQ==",
+    "videoId": "PdLPr9ak_7Y",
+    "viewCountText": {
+        "simpleText": "13,700 views"
+    }
+}
