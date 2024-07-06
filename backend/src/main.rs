@@ -1,5 +1,6 @@
 use actix_files::Files;
 use actix_web::*;
+use database::*;
 use std::time::Duration;
 mod crawler;
 mod database;
@@ -33,15 +34,27 @@ fn crawler_loop() {
 
     loop {
         for channel_id in channels {
-            if let Ok(videos) = crawler::get_channel_videos(channel_id) {
-                for video in videos {
-                    // It's fine for this to fail if the video is already in the database.
-                    if database::insert_video(&video).is_ok() {
-                        println!("Inserted {} {}", video.channel_id, video.video_id);
+            match crawler::get_channel_videos(channel_id) {
+                Ok(videos) => {
+                    for video in videos {
+                        // It's fine for this to fail if the video is already in the database.
+                        // todo: ignore error UNLESS it's due to a duplicate primary key.
+                        match database::insert_video(&video) {
+                            Ok(()) => println!("Inserted {} {}", video.channel_id, video.video_id),
+                            // Igore error if we've already stored this video.
+                            Err(InsertError::AlreadyExists) => (),
+                            Err(InsertError::Other(e)) => {
+                                println!(
+                                    "Failed to insert video {} {} because: {}",
+                                    video.channel_id,
+                                    video.video_id,
+                                    e.to_string()
+                                )
+                            }
+                        }
                     }
                 }
-            } else {
-                println!("Failed to crawl {}", channel_id); // todo: print error
+                Err(e) => println!("Failed to crawl {} because: {}", channel_id, e.to_string()),
             }
         }
 

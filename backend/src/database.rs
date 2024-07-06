@@ -24,8 +24,13 @@ pub fn select_unwatched_videos() -> Result<String, Box<dyn Error>> {
     }
 }
 
+pub enum InsertError {
+    AlreadyExists,
+    Other(Box<dyn Error>),
+}
+
 #[must_use]
-pub fn insert_video(video: &VideoDetails) -> Result<(), Box<dyn Error>> {
+pub fn insert_video(video: &VideoDetails) -> Result<(), InsertError> {
     let mut connection = open_connection();
 
     let query = sqlx::query("INSERT INTO videos VALUES ($1, $2, $3, $4, $5);")
@@ -37,7 +42,14 @@ pub fn insert_video(video: &VideoDetails) -> Result<(), Box<dyn Error>> {
         .execute(&mut connection);
 
     if let Err(e) = futures::executor::block_on(query) {
-        Err(Box::new(e))
+        if let Some(db_error) = e.as_database_error() {
+            if db_error.is_unique_violation() {
+                let f = InsertError::AlreadyExists;
+                return Err(f);
+            }
+        }
+
+        Err(InsertError::Other(Box::new(e)))
     } else {
         Ok(())
     }
