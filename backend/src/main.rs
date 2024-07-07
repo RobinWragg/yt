@@ -88,8 +88,9 @@ async fn main() {
             .service(set_video_watched)
             .service(all_channel_ids)
             .service(
-                Files::new("/yt", "../frontend/out/")
+                Files::new("/", "../frontend/out/")
                     .index_file("index.html")
+                    .prefer_utf8(true)
                     .show_files_listing(),
             )
     })
