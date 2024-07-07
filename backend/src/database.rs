@@ -4,7 +4,7 @@ use std::error::Error;
 use crate::VideoDetails;
 
 #[must_use]
-pub fn select_unwatched_videos() -> Result<String, Box<dyn Error>> {
+pub fn select_unwatched_videos_as_json() -> Result<String, Box<dyn Error>> {
     let mut connection = open_connection();
 
     let query = sqlx::query(
@@ -68,6 +68,12 @@ pub fn select_all_channel_ids() -> Result<Vec<String>, Box<dyn Error>> {
         }
         Err(e) => Err(e.into()),
     }
+}
+
+#[must_use]
+pub fn select_all_channel_ids_as_json() -> Result<String, Box<dyn Error>> {
+    let channels_vec = select_all_channel_ids()?;
+    Ok(serde_json::to_string(&channels_vec)?)
 }
 
 #[must_use]

@@ -16,17 +16,26 @@ struct VideoDetails {
 }
 
 #[get("api/unwatched_videos")]
-async fn http_get_unwatched_videos() -> impl Responder {
-    match database::select_unwatched_videos() {
-        Ok(v) => HttpResponse::Ok().body(v),
+async fn unwatched_videos() -> impl Responder {
+    match database::select_unwatched_videos_as_json() {
+        Ok(json_array) => HttpResponse::Ok().body(json_array),
         Err(e) => HttpResponse::NotFound().body(e.to_string()),
     }
 }
 
 #[post("api/set_video_watched")]
-async fn http_set_video_watched(req_body: String) -> impl Responder {
+async fn set_video_watched(req_body: String) -> impl Responder {
     // todo
     HttpResponse::Ok().body(req_body)
+}
+
+// TODO: Untested!
+#[get("api/all_channel_ids")]
+async fn all_channel_ids() -> impl Responder {
+    match database::select_all_channel_ids_as_json() {
+        Ok(json_array) => HttpResponse::Ok().body(json_array),
+        Err(e) => HttpResponse::NotFound().body(e.to_string()),
+    }
 }
 
 fn crawler_loop() {
@@ -73,10 +82,11 @@ async fn main() {
     let _ = HttpServer::new(|| {
         // NOTE: Here, the API services need to be before the Files::new service.
         App::new()
-            .service(http_get_unwatched_videos)
-            .service(http_set_video_watched)
+            .service(unwatched_videos)
+            .service(set_video_watched)
+            .service(all_channel_ids)
             .service(
-                Files::new("/", "../frontend/out/")
+                Files::new("/yt", "../frontend/out/")
                     .index_file("index.html")
                     .show_files_listing(),
             )
