@@ -69,7 +69,9 @@ fn crawler_loop() {
 
         println!("Sleeping");
 
-        std::thread::sleep(Duration::from_secs(30)); // todo: SECONDS_PER_DAY
+        const SECONDS_PER_MINUTE: u64 = 60;
+        const SECONDS_PER_HOUR: u64 = SECONDS_PER_MINUTE * 60;
+        std::thread::sleep(Duration::from_secs(SECONDS_PER_HOUR * 23)); // Just under a day
     }
 }
 
