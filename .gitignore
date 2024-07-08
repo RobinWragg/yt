@@ -1,16 +1,18 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
 frontend/node_modules
-frontend/.pnp
+
+# dependencies
+frontend_old/node_modules
+frontend_old/.pnp
 .pnp.js
 
 # next.js
-frontend/.next/
-frontend/out/
+frontend_old/.next/
+frontend_old/out/
 
 # production
-frontend/build
+frontend_old/build
 
 # misc
 .DS_Store
