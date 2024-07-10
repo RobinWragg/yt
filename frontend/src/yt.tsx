@@ -41,9 +41,9 @@ export default function Table() {
     refreshEntries();
   }, []);
 
-  // Don't render if there's no data to display.
+  // Don't render the table if there's no data to display.
   if (entries.length === 0) {
-    return null;
+    return <p>(no entries)</p>;
   }
 
   // Sort entries (see onClickHeader)
