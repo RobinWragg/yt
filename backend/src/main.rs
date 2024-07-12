@@ -100,7 +100,7 @@ async fn main() {
             .service(set_video_watched)
             .service(all_channel_ids)
             .service(
-                Files::new("/", "../frontend/out/")
+                Files::new("/", "../frontend/dist/")
                     .index_file("index.html")
                     .prefer_utf8(true)
                     .show_files_listing(),
