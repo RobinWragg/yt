@@ -1,6 +1,7 @@
 use actix_files::Files;
 use actix_web::*;
 use database::*;
+use serde::Deserialize;
 use std::time::Duration;
 mod crawler;
 mod database;
