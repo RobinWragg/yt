@@ -81,6 +81,20 @@ pub fn insert_video(video: &VideoDetails) -> Result<(), InsertError> {
     }
 }
 
+pub fn set_video_watched(video_id: &str) -> Result<(), Box<dyn Error>> {
+    let mut connection = open_connection();
+
+    let query = sqlx::query("UPDATE videos SET watched=TRUE WHERE video_id=$1;")
+        .bind(&video_id)
+        .execute(&mut connection);
+
+    if let Err(e) = futures::executor::block_on(query) {
+        Err(Box::new(e))
+    } else {
+        Ok(())
+    }
+}
+
 pub fn select_all_channel_ids() -> Result<Vec<String>, Box<dyn Error>> {
     let mut connection = open_connection();
 
