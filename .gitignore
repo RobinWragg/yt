@@ -3,18 +3,6 @@
 frontend/node_modules
 frontend/dist
 
-# dependencies
-frontend_old/node_modules
-frontend_old/.pnp
-.pnp.js
-
-# next.js
-frontend_old/.next/
-frontend_old/out/
-
-# production
-frontend_old/build
-
 # misc
 .DS_Store
 *.pem
