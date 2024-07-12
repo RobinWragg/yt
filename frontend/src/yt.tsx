@@ -43,7 +43,7 @@ export default function Table() {
 
   // Don't render the table if there's no data to display.
   if (entries.length === 0) {
-    return <p>(no entries)</p>;
+    return <p>...</p>;
   }
 
   // Sort entries (see onClickHeader)
@@ -80,14 +80,30 @@ export default function Table() {
       setReverseSortOrder(false);
     }
   }
-  function onClickDelete(entryId: string) {
-    // Dummy API request to delete video. TODO
-    console.log("begin video delete", entryId);
-    setTimeout(() => {
-      console.log("end video delete");
+
+  async function onClickDelete(entryId: string) {
+    const response = await fetch(
+      "http://127.0.0.1:8080/api/set_video_watched",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          server_key: localStorage.getItem("server_key"),
+          video_id: entryId,
+        }),
+      }
+    );
+
+    if (response.ok) {
       refreshEntries();
-    }, 1000);
+    } else {
+      throw new Error(`Response status: ${response.status}`);
+    }
   }
+
   function onClickWatch(entryId: string) {
     window.open("https://www.youtube.com/watch?v=" + entryId);
     onClickDelete(entryId);
