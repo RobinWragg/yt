@@ -23,10 +23,22 @@ async fn unwatched_videos() -> impl Responder {
     }
 }
 
+#[derive(Deserialize)]
+struct VideoRequestInput {
+    server_key: String,
+    video_id: String,
+}
+
 #[post("api/set_video_watched")]
-async fn set_video_watched(req_body: String) -> impl Responder {
-    // todo
-    HttpResponse::Ok().body(req_body)
+async fn set_video_watched(info: web::Json<VideoRequestInput>) -> impl Responder {
+    // TODO: check server_key
+    match database::set_video_watched(&info.video_id) {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(e) => {
+            println!("api/set_video_watched failure: {}", e.to_string());
+            HttpResponse::InternalServerError().finish()
+        }
+    }
 }
 
 // TODO: Untested!
