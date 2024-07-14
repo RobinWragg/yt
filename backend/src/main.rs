@@ -2,9 +2,12 @@ use actix_files::Files;
 use actix_web::*;
 use database::*;
 use serde::Deserialize;
+use std::path::PathBuf;
 use std::time::Duration;
 mod crawler;
 mod database;
+
+const FRONTEND_BUILD_PATH: &str = "../frontend/dist/";
 
 type DateTime = chrono::DateTime<chrono::Utc>;
 
@@ -49,6 +52,15 @@ async fn all_channel_ids() -> impl Responder {
         Ok(json_array) => HttpResponse::Ok().body(json_array),
         Err(e) => HttpResponse::NotFound().body(e.to_string()),
     }
+}
+
+async fn index_handler(_req: HttpRequest) -> Result<HttpResponse> {
+    let mut index_path = PathBuf::from(FRONTEND_BUILD_PATH);
+    index_path.push("index.html");
+    let index_html = std::fs::read_to_string(index_path).unwrap();
+    Ok(HttpResponse::Ok()
+        .content_type("text/html")
+        .body(index_html))
 }
 
 fn crawler_loop() {
@@ -101,11 +113,11 @@ async fn main() {
             .service(set_video_watched)
             .service(all_channel_ids)
             .service(
-                Files::new("/", "../frontend/dist/")
+                Files::new("/", FRONTEND_BUILD_PATH)
                     .index_file("index.html")
-                    .prefer_utf8(true)
-                    .show_files_listing(),
+                    .prefer_utf8(true),
             )
+            .default_service(web::route().to(index_handler))
     })
     .bind(("127.0.0.1", 8080))
     .unwrap()
