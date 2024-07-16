@@ -81,6 +81,28 @@ pub fn insert_video(video: &VideoDetails) -> Result<(), InsertError> {
     }
 }
 
+pub fn insert_channel(channel_id: &str) -> Result<(), InsertError> {
+    let mut connection = open_connection();
+
+    let query = sqlx::query("INSERT INTO channels VALUES ($1);")
+        .bind(&channel_id)
+        .bind(false)
+        .execute(&mut connection);
+
+    if let Err(e) = futures::executor::block_on(query) {
+        if let Some(db_error) = e.as_database_error() {
+            if db_error.is_unique_violation() {
+                let f = InsertError::AlreadyExists;
+                return Err(f);
+            }
+        }
+
+        Err(InsertError::Other(Box::new(e)))
+    } else {
+        Ok(())
+    }
+}
+
 pub fn set_video_watched(video_id: &str) -> Result<(), Box<dyn Error>> {
     let mut connection = open_connection();
 

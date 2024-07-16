@@ -67,6 +67,12 @@ fn crawler_loop() {
     let channels = database::select_all_channel_ids().expect("Can't get channels");
 
     loop {
+        println!("Sleeping");
+
+        const SECONDS_PER_MINUTE: u64 = 60;
+        const SECONDS_PER_HOUR: u64 = SECONDS_PER_MINUTE * 60;
+        std::thread::sleep(Duration::from_secs(SECONDS_PER_HOUR * 23)); // Just under a day
+
         for channel_id in &channels {
             match crawler::get_channel_videos(&channel_id) {
                 Ok(videos) => {
@@ -91,12 +97,6 @@ fn crawler_loop() {
                 Err(e) => println!("Failed to crawl {} because: {}", channel_id, e.to_string()),
             }
         }
-
-        println!("Sleeping");
-
-        const SECONDS_PER_MINUTE: u64 = 60;
-        const SECONDS_PER_HOUR: u64 = SECONDS_PER_MINUTE * 60;
-        std::thread::sleep(Duration::from_secs(SECONDS_PER_HOUR * 23)); // Just under a day
     }
 }
 
