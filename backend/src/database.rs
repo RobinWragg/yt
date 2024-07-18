@@ -3,7 +3,7 @@ use std::error::Error;
 
 use crate::VideoDetails;
 
-pub fn dump() -> Result<String, Box<dyn Error>> {
+pub fn dump_to_json() -> Result<String, Box<dyn Error>> {
     let mut connection = open_connection();
     let table_names = select_all_table_names()?;
 
