@@ -100,10 +100,10 @@ export default function Table() {
     );
 
     if (response.ok) {
-      refreshEntries();
-    } else {
       throw new Error(`Response status: ${response.status}`);
     }
+    
+    refreshEntries();
   }
 
   function onClickWatch(entryId: string) {
