@@ -113,6 +113,8 @@ export default function Table() {
 
   // borderCollapse is needed to color rows correctly.
   return (
+    <>
+    {sortedEntries.length}
     <table style={{ borderCollapse: "collapse", margin: "auto" }}>
       <thead>
         <tr>
@@ -159,5 +161,6 @@ export default function Table() {
         })}
       </tbody>
     </table>
+    </>
   );
 }
