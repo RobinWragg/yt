@@ -99,10 +99,10 @@ export default function Table() {
       }
     );
 
-    if (response.ok) {
+    if (!response.ok) {
       throw new Error(`Response status: ${response.status}`);
     }
-    
+
     refreshEntries();
   }
 
