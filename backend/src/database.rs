@@ -3,6 +3,31 @@ use std::error::Error;
 
 use crate::VideoDetails;
 
+pub fn select_outofdate_channels() -> Result<Vec<String>, Box<dyn Error>> {
+    let mut connection = open_connection();
+
+    let query_str = "
+        SELECT DISTINCT channel_id
+        FROM channels
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM videos
+            WHERE videos.channel_id = channels.channel_id
+            AND videos.published > (NOW() - INTERVAL '24 hours')
+        );
+    ";
+
+    let query = sqlx::query(&query_str).fetch_all(&mut connection);
+
+    match futures::executor::block_on(query) {
+        Ok(row) => {
+            let strings: Vec<String> = row.iter().map(|row| row.get(0)).collect();
+            Ok(strings)
+        }
+        Err(e) => Err(e.into()),
+    }
+}
+
 pub fn dump_to_json() -> Result<String, Box<dyn Error>> {
     let mut connection = open_connection();
     let table_names = select_all_table_names()?;
