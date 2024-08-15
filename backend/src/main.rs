@@ -92,6 +92,8 @@ fn crawler_loop() {
             }
         }
 
+        // TODO: Remove watched videos from the database if they no longer appear on the channel pages.
+
         println!("Sleeping");
 
         const SECONDS_PER_MINUTE: u64 = 60;
@@ -103,6 +105,9 @@ fn crawler_loop() {
 #[actix_web::main]
 async fn main() {
     println!("Hello, world!");
+
+    // let j = database::dump_to_json().unwrap();
+    // database::overwrite_from_json(&j);
 
     std::thread::spawn(crawler_loop);
 

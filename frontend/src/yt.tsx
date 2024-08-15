@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CSS from "csstype";
+import { Box } from "@mui/material";
 
 // TODO: can i just use json instead of defining this?
 interface TableEntry {
@@ -82,8 +83,8 @@ export default function Table() {
   }
 
   async function onClickDelete(entryId: string) {
-    const serverKey = 'todo';
-    
+    const serverKey = "todo";
+
     const response = await fetch(
       "http://127.0.0.1:8080/api/set_video_watched",
       {
@@ -113,54 +114,21 @@ export default function Table() {
 
   // borderCollapse is needed to color rows correctly.
   return (
-    <>
-    {sortedEntries.length}
-    <table style={{ borderCollapse: "collapse", margin: "auto" }}>
-      <thead>
-        <tr>
-          {columns.map(({ label, accessor }) => {
-            return (
-              <th
-                onClick={() => onClickHeader(accessor, reverseSortOrder)}
-                style={thStyle}
-                key={accessor}
-              >
-                {label}
-              </th>
-            );
-          })}
-        </tr>
-      </thead>
-      <tbody>
-        {sortedEntries.map((entry, rowIndex) => {
-          return (
-            <tr key={entry.video_id} style={trStyle(rowIndex)}>
-              {columns.map(({ accessor }) => {
-                return (
-                  <td key={accessor} style={{ paddingRight: "10px" }}>
-                    {entry[accessor as keyof TableEntry]}
-                  </td>
-                );
-              })}
-              <td>
-                <button
-                  title="Watch"
-                  onClick={() => onClickWatch(entry.video_id)}
-                >
-                  👁️
-                </button>
-                <button
-                  title="Delete"
-                  onClick={() => onClickDelete(entry.video_id)}
-                >
-                  ❌
-                </button>
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-    </>
+    <Box>
+      {sortedEntries.length}
+      {sortedEntries.map((entry, rowIndex) => {
+        return (
+          <Box sx={{ margin: "10px", display: "flex" }}>
+            <Box sx={{ width: "300px" }}>
+              <Box>{entry.channel_id}</Box>
+              <Box>{entry.published}</Box>
+            </Box>
+            <Box sx={{ backgroundColor: "blue", width: "800px" }}>
+              {entry.title}
+            </Box>
+          </Box>
+        );
+      })}
+    </Box>
   );
 }

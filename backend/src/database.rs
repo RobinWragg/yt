@@ -56,6 +56,37 @@ pub fn dump_to_json() -> Result<String, Box<dyn Error>> {
     Ok(json_object.to_string())
 }
 
+pub fn overwrite_from_json(json_str: &str) -> Result<(), Box<dyn Error>> {
+    let mut connection = open_connection();
+
+    let query_str = "
+    BEGIN
+    TRUNCATE channels;
+    TRUNCATE videos;
+    END;
+    ";
+
+    let query = sqlx::query("TRUNCATE channels;").execute(&mut connection);
+    futures::executor::block_on(query).unwrap();
+    let query = sqlx::query("TRUNCATE videos;").execute(&mut connection);
+    futures::executor::block_on(query).unwrap();
+
+    let obj: serde_json::Value = serde_json::from_str(json_str)?;
+    let obj = obj.as_object().unwrap();
+
+    let videos: &serde_json::Value = &obj["videos"];
+    let videos = videos.as_array().unwrap();
+    for v in videos {
+        let video_id = v["video_id"].to_string();
+        let channel_id = v["channel_id"].to_string();
+        let published = v["published"].to_string();
+        let watched = v["watched"].to_string();
+        let title = v["title"].to_string();
+    }
+
+    Ok(())
+}
+
 pub fn select_unwatched_videos_as_json() -> Result<String, Box<dyn Error>> {
     let mut connection = open_connection();
 
