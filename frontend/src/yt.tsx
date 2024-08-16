@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CSS from "csstype";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 // TODO: can i just use json instead of defining this?
 interface TableEntry {
@@ -114,18 +114,32 @@ export default function Table() {
 
   // borderCollapse is needed to color rows correctly.
   return (
-    <Box>
+    <Box
+      sx={{
+        display: "flex",
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       {sortedEntries.length}
       {sortedEntries.map((entry, rowIndex) => {
         return (
-          <Box sx={{ margin: "10px", display: "flex" }}>
-            <Box sx={{ width: "300px" }}>
+          <Box
+            sx={{
+              margin: "10px",
+              display: "flex",
+              padding: "10px",
+              backgroundColor: "#444",
+              borderRadius: "10px",
+              width: "800px",
+            }}
+          >
+            <Box sx={{ width: "250px", minWidth: "250px" }}>
               <Box>{entry.channel_id}</Box>
-              <Box>{entry.published}</Box>
+              <Box sx={{ fontSize: "10px" }}>{entry.published}</Box>
             </Box>
-            <Box sx={{ backgroundColor: "blue", width: "800px" }}>
-              {entry.title}
-            </Box>
+            <Box>{entry.title}</Box>
           </Box>
         );
       })}
