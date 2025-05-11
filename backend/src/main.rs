@@ -64,7 +64,8 @@ async fn index_handler(_req: HttpRequest) -> Result<HttpResponse> {
 }
 
 fn crawler_loop() {
-    let channels = database::select_outofdate_channels().expect("Can't get channels");
+    // let channels = database::select_outofdate_channels().expect("Can't get channels");
+    let channels = database::select_all_channel_ids().expect("Can't get channels");
 
     loop {
         for channel_id in &channels {
