@@ -107,7 +107,7 @@ export default function Table() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8080/api/add_channel", {
+      const response = await fetch("http://127.0.0.1:8080/api/insert_channel", {
         method: "POST",
         headers: {
           Accept: "application/json",
