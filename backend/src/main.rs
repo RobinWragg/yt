@@ -63,34 +63,38 @@ async fn index_handler(_req: HttpRequest) -> Result<HttpResponse> {
         .body(index_html))
 }
 
+fn crawl_channel(channel_id: &str) {
+    match crawler::get_channel_videos(&channel_id) {
+        Ok(videos) => {
+            for video in videos {
+                // It's fine for this to fail if the video is already in the database.
+                // todo: ignore error UNLESS it's due to a duplicate primary key.
+                match database::insert_video(&video) {
+                    Ok(()) => println!("Inserted {} {}", video.channel_id, video.video_id),
+                    // Igore error if we've already stored this video.
+                    Err(InsertError::AlreadyExists) => (),
+                    Err(InsertError::Other(e)) => {
+                        println!(
+                            "Failed to insert video {} {} because: {}",
+                            video.channel_id,
+                            video.video_id,
+                            e.to_string()
+                        )
+                    }
+                }
+            }
+        }
+        Err(e) => println!("Failed to crawl {} because: {}", channel_id, e.to_string()),
+    }
+}
+
 fn crawler_loop() {
     // let channels = database::select_outofdate_channels().expect("Can't get channels");
     let channels = database::select_all_channel_ids().expect("Can't get channels");
 
     loop {
         for channel_id in &channels {
-            match crawler::get_channel_videos(&channel_id) {
-                Ok(videos) => {
-                    for video in videos {
-                        // It's fine for this to fail if the video is already in the database.
-                        // todo: ignore error UNLESS it's due to a duplicate primary key.
-                        match database::insert_video(&video) {
-                            Ok(()) => println!("Inserted {} {}", video.channel_id, video.video_id),
-                            // Igore error if we've already stored this video.
-                            Err(InsertError::AlreadyExists) => (),
-                            Err(InsertError::Other(e)) => {
-                                println!(
-                                    "Failed to insert video {} {} because: {}",
-                                    video.channel_id,
-                                    video.video_id,
-                                    e.to_string()
-                                )
-                            }
-                        }
-                    }
-                }
-                Err(e) => println!("Failed to crawl {} because: {}", channel_id, e.to_string()),
-            }
+            crawl_channel(&channel_id);
         }
 
         println!("Sleeping");
@@ -124,4 +128,17 @@ async fn main() {
     .unwrap()
     .run()
     .await;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::crawl_channel;
+
+    #[test]
+    fn test_crawl_channel_signature() {
+        // This test verifies that the crawl_channel function has the expected signature
+        // We can't actually run it in tests without a database, but we can verify the signature works
+        let _test_function = || crawl_channel("test_channel_id");
+        // The test passes if this compiles without errors
+    }
 }
