@@ -63,39 +63,38 @@ async fn index_handler(_req: HttpRequest) -> Result<HttpResponse> {
         .body(index_html))
 }
 
-fn crawler_loop(channel_id: Option<&str>) {
-    let channels = match channel_id {
-        Some(id) => vec![id.to_string()],
-        None => {
-            // let channels = database::select_outofdate_channels().expect("Can't get channels");
-            database::select_all_channel_ids().expect("Can't get channels")
+fn crawl_channel(channel_id: &str) {
+    match crawler::get_channel_videos(&channel_id) {
+        Ok(videos) => {
+            for video in videos {
+                // It's fine for this to fail if the video is already in the database.
+                // todo: ignore error UNLESS it's due to a duplicate primary key.
+                match database::insert_video(&video) {
+                    Ok(()) => println!("Inserted {} {}", video.channel_id, video.video_id),
+                    // Igore error if we've already stored this video.
+                    Err(InsertError::AlreadyExists) => (),
+                    Err(InsertError::Other(e)) => {
+                        println!(
+                            "Failed to insert video {} {} because: {}",
+                            video.channel_id,
+                            video.video_id,
+                            e.to_string()
+                        )
+                    }
+                }
+            }
         }
-    };
+        Err(e) => println!("Failed to crawl {} because: {}", channel_id, e.to_string()),
+    }
+}
+
+fn crawler_loop() {
+    // let channels = database::select_outofdate_channels().expect("Can't get channels");
+    let channels = database::select_all_channel_ids().expect("Can't get channels");
 
     loop {
         for channel_id in &channels {
-            match crawler::get_channel_videos(&channel_id) {
-                Ok(videos) => {
-                    for video in videos {
-                        // It's fine for this to fail if the video is already in the database.
-                        // todo: ignore error UNLESS it's due to a duplicate primary key.
-                        match database::insert_video(&video) {
-                            Ok(()) => println!("Inserted {} {}", video.channel_id, video.video_id),
-                            // Igore error if we've already stored this video.
-                            Err(InsertError::AlreadyExists) => (),
-                            Err(InsertError::Other(e)) => {
-                                println!(
-                                    "Failed to insert video {} {} because: {}",
-                                    video.channel_id,
-                                    video.video_id,
-                                    e.to_string()
-                                )
-                            }
-                        }
-                    }
-                }
-                Err(e) => println!("Failed to crawl {} because: {}", channel_id, e.to_string()),
-            }
+            crawl_channel(&channel_id);
         }
 
         println!("Sleeping");
@@ -110,7 +109,7 @@ fn crawler_loop(channel_id: Option<&str>) {
 async fn main() {
     println!("Hello, world!");
 
-    std::thread::spawn(|| crawler_loop(None));
+    std::thread::spawn(crawler_loop);
 
     let _ = HttpServer::new(|| {
         // NOTE: Here, the API services need to be before the Files::new service.
@@ -133,33 +132,13 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::crawler_loop;
+    use super::crawl_channel;
 
     #[test]
-    fn test_crawler_loop_signature() {
-        // This test verifies that the crawler_loop function can be called with both None and Some values
-        // We can't actually run the function in tests without a database, but we can verify the signature works
-        let _test_none = || crawler_loop(None);
-        let _test_some = || crawler_loop(Some("test_channel"));
+    fn test_crawl_channel_signature() {
+        // This test verifies that the crawl_channel function has the expected signature
+        // We can't actually run it in tests without a database, but we can verify the signature works
+        let _test_function = || crawl_channel("test_channel_id");
         // The test passes if this compiles without errors
-    }
-
-    #[test] 
-    fn test_channel_selection_logic() {
-        // Test the channel selection logic by creating a helper function that mirrors the core logic
-        fn get_channels_for_crawling(channel_id: Option<&str>) -> Vec<String> {
-            match channel_id {
-                Some(id) => vec![id.to_string()],
-                None => vec!["channel1".to_string(), "channel2".to_string()], // Mock database result
-            }
-        }
-
-        // Test with specific channel
-        let specific_channels = get_channels_for_crawling(Some("specific_channel"));
-        assert_eq!(specific_channels, vec!["specific_channel".to_string()]);
-
-        // Test with None (all channels)
-        let all_channels = get_channels_for_crawling(None);
-        assert_eq!(all_channels, vec!["channel1".to_string(), "channel2".to_string()]);
     }
 }
