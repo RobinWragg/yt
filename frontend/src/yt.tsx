@@ -72,8 +72,6 @@ export default function Table() {
   }, []);
 
   async function onClickDelete(entryId: string) {
-    const serverKey = "todo";
-
     const response = await fetch(
       "http://127.0.0.1:8080/api/set_video_watched",
       {
@@ -83,7 +81,6 @@ export default function Table() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          server_key: serverKey,
           video_id: entryId,
         }),
       }

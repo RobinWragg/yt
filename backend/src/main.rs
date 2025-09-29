@@ -29,19 +29,16 @@ async fn unwatched_videos() -> impl Responder {
 
 #[derive(Deserialize)]
 struct VideoRequestInput {
-    server_key: String,
     video_id: String,
 }
 
 #[derive(Deserialize)]
 struct ChannelRequestInput {
-    server_key: String,
     channel_id: String,
 }
 
 #[post("api/set_video_watched")]
 async fn set_video_watched(info: web::Json<VideoRequestInput>) -> impl Responder {
-    // TODO: check server_key
     match database::set_video_watched(&info.video_id) {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
@@ -62,7 +59,6 @@ async fn all_channel_ids() -> impl Responder {
 
 #[post("api/delete_channel")]
 async fn delete_channel(info: web::Json<ChannelRequestInput>) -> impl Responder {
-    // TODO: check server_key
     match database::delete_channel(&info.channel_id) {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
