@@ -33,6 +33,12 @@ struct VideoRequestInput {
     video_id: String,
 }
 
+#[derive(Deserialize)]
+struct ChannelRequestInput {
+    server_key: String,
+    channel_id: String,
+}
+
 #[post("api/set_video_watched")]
 async fn set_video_watched(info: web::Json<VideoRequestInput>) -> impl Responder {
     // TODO: check server_key
@@ -51,6 +57,18 @@ async fn all_channel_ids() -> impl Responder {
     match database::select_all_channel_ids_as_json() {
         Ok(json_array) => HttpResponse::Ok().body(json_array),
         Err(e) => HttpResponse::NotFound().body(e.to_string()),
+    }
+}
+
+#[post("api/delete_channel")]
+async fn delete_channel(info: web::Json<ChannelRequestInput>) -> impl Responder {
+    // TODO: check server_key
+    match database::delete_channel(&info.channel_id) {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(e) => {
+            println!("api/delete_channel failure: {}", e.to_string());
+            HttpResponse::InternalServerError().finish()
+        }
     }
 }
 
@@ -117,6 +135,7 @@ async fn main() {
             .service(unwatched_videos)
             .service(set_video_watched)
             .service(all_channel_ids)
+            .service(delete_channel)
             .service(
                 Files::new("/", FRONTEND_BUILD_PATH)
                     .index_file("index.html")
@@ -133,12 +152,21 @@ async fn main() {
 #[cfg(test)]
 mod tests {
     use super::crawl_channel;
+    use crate::database;
 
     #[test]
     fn test_crawl_channel_signature() {
         // This test verifies that the crawl_channel function has the expected signature
         // We can't actually run it in tests without a database, but we can verify the signature works
         let _test_function = || crawl_channel("test_channel_id");
+        // The test passes if this compiles without errors
+    }
+
+    #[test]
+    fn test_delete_channel_endpoint_signature() {
+        // This test verifies that our delete_channel database function exists and has the expected signature
+        // We can't actually run it in tests without a database, but we can verify the signature works
+        let _test_function = || database::delete_channel("test_channel_id");
         // The test passes if this compiles without errors
     }
 }
