@@ -33,6 +33,11 @@ struct VideoRequestInput {
     video_id: String,
 }
 
+#[derive(Deserialize)]
+struct ChannelRequestInput {
+    channel_id: String,
+}
+
 #[post("api/set_video_watched")]
 async fn set_video_watched(info: web::Json<VideoRequestInput>) -> impl Responder {
     // TODO: check server_key
@@ -41,6 +46,34 @@ async fn set_video_watched(info: web::Json<VideoRequestInput>) -> impl Responder
         Err(e) => {
             println!("api/set_video_watched failure: {}", e.to_string());
             HttpResponse::InternalServerError().finish()
+        }
+    }
+}
+
+#[post("api/insert_channel")]
+async fn insert_channel(info: web::Json<ChannelRequestInput>) -> impl Responder {
+    let channel_id = info.channel_id.trim();
+    
+    if channel_id.is_empty() {
+        return HttpResponse::BadRequest().body("Channel ID cannot be empty");
+    }
+    
+    match database::insert_channel(channel_id) {
+        Ok(_) => {
+            // Start crawling the channel in a separate thread
+            let channel_id_owned = channel_id.to_string();
+            std::thread::spawn(move || {
+                crawl_channel(&channel_id_owned);
+            });
+            
+            HttpResponse::Ok().finish()
+        }
+        Err(InsertError::AlreadyExists) => {
+            HttpResponse::Conflict().body("Channel already exists")
+        }
+        Err(InsertError::Other(e)) => {
+            println!("api/insert_channel failure: {}", e.to_string());
+            HttpResponse::InternalServerError().body("Failed to insert channel")
         }
     }
 }
@@ -116,6 +149,7 @@ async fn main() {
         App::new()
             .service(unwatched_videos)
             .service(set_video_watched)
+            .service(insert_channel)
             .service(all_channel_ids)
             .service(
                 Files::new("/", FRONTEND_BUILD_PATH)
@@ -140,5 +174,14 @@ mod tests {
         // We can't actually run it in tests without a database, but we can verify the signature works
         let _test_function = || crawl_channel("test_channel_id");
         // The test passes if this compiles without errors
+    }
+
+    #[test]
+    fn test_channel_request_input_struct() {
+        // Test that the ChannelRequestInput struct can be deserialized
+        use super::ChannelRequestInput;
+        let json_str = r#"{"channel_id": "test_channel"}"#;
+        let _input: ChannelRequestInput = serde_json::from_str(json_str).unwrap();
+        // The test passes if deserialization works
     }
 }
