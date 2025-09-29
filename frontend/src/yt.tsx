@@ -152,6 +152,7 @@ export default function Table() {
                     "&:hover": {
                       backgroundColor: "action.hover",
                     },
+                    px: 2,
                     py: 2,
                     display: "flex",
                     alignItems: "flex-start",
