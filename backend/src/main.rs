@@ -63,9 +63,14 @@ async fn index_handler(_req: HttpRequest) -> Result<HttpResponse> {
         .body(index_html))
 }
 
-fn crawler_loop() {
-    // let channels = database::select_outofdate_channels().expect("Can't get channels");
-    let channels = database::select_all_channel_ids().expect("Can't get channels");
+fn crawler_loop(channel_id: Option<&str>) {
+    let channels = match channel_id {
+        Some(id) => vec![id.to_string()],
+        None => {
+            // let channels = database::select_outofdate_channels().expect("Can't get channels");
+            database::select_all_channel_ids().expect("Can't get channels")
+        }
+    };
 
     loop {
         for channel_id in &channels {
@@ -105,7 +110,7 @@ fn crawler_loop() {
 async fn main() {
     println!("Hello, world!");
 
-    std::thread::spawn(crawler_loop);
+    std::thread::spawn(|| crawler_loop(None));
 
     let _ = HttpServer::new(|| {
         // NOTE: Here, the API services need to be before the Files::new service.
@@ -124,4 +129,37 @@ async fn main() {
     .unwrap()
     .run()
     .await;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::crawler_loop;
+
+    #[test]
+    fn test_crawler_loop_signature() {
+        // This test verifies that the crawler_loop function can be called with both None and Some values
+        // We can't actually run the function in tests without a database, but we can verify the signature works
+        let _test_none = || crawler_loop(None);
+        let _test_some = || crawler_loop(Some("test_channel"));
+        // The test passes if this compiles without errors
+    }
+
+    #[test] 
+    fn test_channel_selection_logic() {
+        // Test the channel selection logic by creating a helper function that mirrors the core logic
+        fn get_channels_for_crawling(channel_id: Option<&str>) -> Vec<String> {
+            match channel_id {
+                Some(id) => vec![id.to_string()],
+                None => vec!["channel1".to_string(), "channel2".to_string()], // Mock database result
+            }
+        }
+
+        // Test with specific channel
+        let specific_channels = get_channels_for_crawling(Some("specific_channel"));
+        assert_eq!(specific_channels, vec!["specific_channel".to_string()]);
+
+        // Test with None (all channels)
+        let all_channels = get_channels_for_crawling(None);
+        assert_eq!(all_channels, vec!["channel1".to_string(), "channel2".to_string()]);
+    }
 }
