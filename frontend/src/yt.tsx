@@ -155,7 +155,7 @@ export default function Table() {
                     px: 2,
                     py: 2,
                     display: "flex",
-                    alignItems: "flex-start",
+                    alignItems: "center",
                   }}
                   onClick={() => onClickWatch(entry.video_id)}
                 >
