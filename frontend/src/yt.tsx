@@ -170,11 +170,11 @@ export default function Table() {
                         </Typography>
                       }
                       secondary={
-                        <Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                           <Typography
                             variant="body2"
                             color="text.secondary"
-                            sx={{ mb: 0.5 }}
+                            sx={{ flexShrink: 0 }}
                           >
                             {entry.published}
                           </Typography>
