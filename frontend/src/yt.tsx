@@ -1,7 +1,21 @@
 import { useState, useEffect } from "react";
-import CSS from "csstype";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@mui/material";
+import { Delete } from "@mui/icons-material";
 
-// TODO: can i just use json instead of defining this?
 interface TableEntry {
   video_id: string;
   title: string;
@@ -9,17 +23,26 @@ interface TableEntry {
   published: string;
 }
 
-const columns = [
-  { label: "ID", accessor: "video_id" },
-  { label: "Date", accessor: "published" },
-  { label: "Channel", accessor: "channel_id" },
-  { label: "Title", accessor: "title" },
-];
+// Create dark theme
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+    primary: {
+      main: "#ffffff",
+    },
+    background: {
+      default: "#000000",
+      paper: "#121212",
+    },
+    text: {
+      primary: "#ffffff",
+    },
+  },
+});
 
 export default function Table() {
   const [entries, setEntries] = useState<TableEntry[]>([]);
-  const [sortMode, setSortMode] = useState("published"); // Sort by date published by default.
-  const [reverseSortOrder, setReverseSortOrder] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   async function refreshEntries() {
     try {
@@ -40,46 +63,6 @@ export default function Table() {
   useEffect(() => {
     refreshEntries();
   }, []);
-
-  // Don't render the table if there's no data to display.
-  if (entries.length === 0) {
-    return <p>...</p>;
-  }
-
-  // Sort entries (see onClickHeader)
-  const sortedEntries = entries.sort((a: TableEntry, b: TableEntry) => {
-    if (reverseSortOrder) {
-      [a, b] = [b, a];
-    }
-    return a[sortMode as keyof TableEntry].localeCompare(
-      b[sortMode as keyof TableEntry]
-    );
-  });
-
-  // Make the column headers feel like buttons.
-  const thStyle: CSS.Properties = {
-    cursor: "pointer",
-    userSelect: "none",
-  };
-
-  // Implement alternating row colors.
-  function trStyle(rowIndex: number) {
-    return {
-      backgroundColor: rowIndex % 2 === 0 ? "#444" : "black",
-    };
-  }
-
-  //
-  // Handle user input in these functions.
-  //
-  function onClickHeader(accessor: string, previousSortOrder: boolean) {
-    if (sortMode === accessor) {
-      setReverseSortOrder(!previousSortOrder);
-    } else {
-      setSortMode(accessor);
-      setReverseSortOrder(false);
-    }
-  }
 
   async function onClickDelete(entryId: string) {
     const serverKey = "todo";
@@ -111,56 +94,124 @@ export default function Table() {
     onClickDelete(entryId);
   }
 
-  // borderCollapse is needed to color rows correctly.
+  // Sort entries by date published (oldest first)
+  const sortedEntries = [...entries].sort((a: TableEntry, b: TableEntry) => {
+    return new Date(a.published).getTime() - new Date(b.published).getTime();
+  });
+
+  // Filter entries based on search query
+  const filteredEntries = sortedEntries.filter((entry) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      entry.channel_id.toLowerCase().includes(query) ||
+      entry.title.toLowerCase().includes(query) ||
+      entry.published.toLowerCase().includes(query)
+    );
+  });
+
+  // Don't render if there's no data
+  if (entries.length === 0) {
+    return (
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <Container maxWidth="md" sx={{ py: 4 }}>
+          <Typography variant="h6" align="center">
+            Loading...
+          </Typography>
+        </Container>
+      </ThemeProvider>
+    );
+  }
+
   return (
-    <>
-      {sortedEntries.length}
-      <table style={{ borderCollapse: "collapse", margin: "auto" }}>
-        <thead>
-          <tr>
-            {columns.map(({ label, accessor }) => {
-              return (
-                <th
-                  onClick={() => onClickHeader(accessor, reverseSortOrder)}
-                  style={thStyle}
-                  key={accessor}
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom align="center">
+          YouTube Videos ({entries.length})
+        </Typography>
+        
+        <Box sx={{ mb: 3 }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search by channel ID, title, or date..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+        </Box>
+
+        <Paper elevation={3}>
+          <List>
+            {filteredEntries.map((entry, index) => (
+              <Box key={entry.video_id}>
+                <ListItem
+                  sx={{
+                    cursor: "pointer",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                    px: 2,
+                    py: 2,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                  onClick={() => onClickWatch(entry.video_id)}
                 >
-                  {label}
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedEntries.map((entry, rowIndex) => {
-            return (
-              <tr key={entry.video_id} style={trStyle(rowIndex)}>
-                {columns.map(({ accessor }) => {
-                  return (
-                    <td key={accessor} style={{ paddingRight: "10px" }}>
-                      {entry[accessor as keyof TableEntry]}
-                    </td>
-                  );
-                })}
-                <td>
-                  <button
-                    title="Watch"
-                    onClick={() => onClickWatch(entry.video_id)}
+                  <Box sx={{ flexGrow: 1 }}>
+                    <ListItemText
+                      primary={
+                        <Typography
+                          variant="h6"
+                          component="h2"
+                          sx={{ fontWeight: "bold", mb: 1 }}
+                        >
+                          {entry.channel_id}
+                        </Typography>
+                      }
+                      secondary={
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ flexShrink: 0 }}
+                          >
+                            {entry.published}
+                          </Typography>
+                          <Typography variant="body1" color="text.primary">
+                            {entry.title}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </Box>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClickDelete(entry.video_id);
+                    }}
+                    sx={{ ml: 2 }}
                   >
-                    👁️
-                  </button>
-                  <button
-                    title="Delete"
-                    onClick={() => onClickDelete(entry.video_id)}
-                  >
-                    ❌
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </>
+                    <Delete />
+                  </IconButton>
+                </ListItem>
+                {index < filteredEntries.length - 1 && <Divider />}
+              </Box>
+            ))}
+          </List>
+        </Paper>
+
+        {filteredEntries.length === 0 && searchQuery && (
+          <Box sx={{ mt: 3, textAlign: "center" }}>
+            <Typography variant="body1" color="text.secondary">
+              No entries found matching "{searchQuery}"
+            </Typography>
+          </Box>
+        )}
+      </Container>
+    </ThemeProvider>
   );
 }
