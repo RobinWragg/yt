@@ -13,8 +13,13 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
-import { Delete } from "@mui/icons-material";
+import { Delete, Add } from "@mui/icons-material";
 
 interface TableEntry {
   video_id: string;
@@ -43,6 +48,8 @@ const darkTheme = createTheme({
 export default function Table() {
   const [entries, setEntries] = useState<TableEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [channelId, setChannelId] = useState("");
 
   async function refreshEntries() {
     try {
@@ -94,6 +101,44 @@ export default function Table() {
     onClickDelete(entryId);
   }
 
+  async function onAddChannel() {
+    if (!channelId.trim()) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/insert_channel", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channel_id: channelId.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      // Close modal and reset form
+      setIsModalOpen(false);
+      setChannelId("");
+      
+      // Optionally refresh entries to show new data
+      // refreshEntries();
+    } catch (error) {
+      console.error("Failed to add channel:", error);
+      // You could add user-facing error handling here
+    }
+  }
+
+  function handleModalClose() {
+    setIsModalOpen(false);
+    setChannelId("");
+  }
+
   // Sort entries by date published (oldest first)
   const sortedEntries = [...entries].sort((a: TableEntry, b: TableEntry) => {
     return new Date(a.published).getTime() - new Date(b.published).getTime();
@@ -131,15 +176,26 @@ export default function Table() {
           YouTube Videos ({entries.length})
         </Typography>
         
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
           <TextField
             fullWidth
             variant="outlined"
             placeholder="Search by channel ID, title, or date..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{ mb: 2 }}
           />
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => setIsModalOpen(true)}
+            sx={{ 
+              whiteSpace: "nowrap",
+              minWidth: "auto",
+              px: 2
+            }}
+          >
+            Add Channel
+          </Button>
         </Box>
 
         <Paper elevation={3}>
@@ -211,6 +267,39 @@ export default function Table() {
             </Typography>
           </Box>
         )}
+
+        {/* Add Channel Modal */}
+        <Dialog 
+          open={isModalOpen} 
+          onClose={handleModalClose}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Add New Channel</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Channel ID"
+              placeholder="Enter YouTube channel ID (e.g., UCxxxxxxxxxxxxxxxxx)"
+              fullWidth
+              variant="outlined"
+              value={channelId}
+              onChange={(e) => setChannelId(e.target.value)}
+              sx={{ mt: 2 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleModalClose}>Cancel</Button>
+            <Button 
+              onClick={onAddChannel} 
+              variant="contained"
+              disabled={!channelId.trim()}
+            >
+              Add Channel
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </ThemeProvider>
   );
