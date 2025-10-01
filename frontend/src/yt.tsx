@@ -43,6 +43,10 @@ const darkTheme = createTheme({
       primary: "#ffffff",
     },
   },
+  transitions: {
+    // Disable all transitions to remove delay when deleting entries
+    create: () => "none",
+  },
 });
 
 export default function Table() {
@@ -72,10 +76,6 @@ export default function Table() {
   }, []);
 
   async function onClickDelete(entryId: string) {
-    // Optimistically update UI immediately
-    setEntries(entries.filter(entry => entry.video_id !== entryId));
-
-    // Then send the request to the server
     const response = await fetch(
       "http://127.0.0.1:8080/api/set_video_watched",
       {
@@ -91,10 +91,10 @@ export default function Table() {
     );
 
     if (!response.ok) {
-      // If the request fails, refresh to get the correct state
-      console.error(`Response status: ${response.status}`);
-      refreshEntries();
+      throw new Error(`Response status: ${response.status}`);
     }
+
+    refreshEntries();
   }
 
   function onClickWatch(entryId: string) {
