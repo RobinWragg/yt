@@ -50,6 +50,7 @@ export default function Table() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelId, setChannelId] = useState("");
+  const [channels, setChannels] = useState<string[]>([]);
 
   async function refreshEntries() {
     try {
@@ -66,9 +67,25 @@ export default function Table() {
     }
   }
 
+  async function refreshChannels() {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8080/api/all_channel_ids"
+      );
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      setChannels(await response.json());
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // Request data to populate the table with.
   useEffect(() => {
     refreshEntries();
+    refreshChannels();
   }, []);
 
   async function onClickDelete(entryId: string) {
@@ -123,11 +140,36 @@ export default function Table() {
       setIsModalOpen(false);
       setChannelId("");
       
-      // Optionally refresh entries to show new data
-      // refreshEntries();
+      // Refresh channels list to show new channel
+      refreshChannels();
     } catch (error) {
       console.error("Failed to add channel:", error);
       // You could add user-facing error handling here
+    }
+  }
+
+  async function onDeleteChannel(channelIdToDelete: string) {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/delete_channel", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channel_id: channelIdToDelete,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      // Refresh both channels and videos after deletion
+      refreshChannels();
+      refreshEntries();
+    } catch (error) {
+      console.error("Failed to delete channel:", error);
     }
   }
 
@@ -172,6 +214,41 @@ export default function Table() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           YouTube Videos ({entries.length})
         </Typography>
+
+        {/* Channels Section */}
+        {channels.length > 0 && (
+          <Paper elevation={3} sx={{ mb: 3, p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Channels ({channels.length})
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {channels.map((channel) => (
+                <Box
+                  key={channel}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    px: 2,
+                    py: 1,
+                    backgroundColor: "action.hover",
+                    borderRadius: 1,
+                  }}
+                >
+                  <Typography variant="body2">{channel}</Typography>
+                  <IconButton
+                    size="small"
+                    aria-label="delete channel"
+                    onClick={() => onDeleteChannel(channel)}
+                    sx={{ ml: 1 }}
+                  >
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </Box>
+              ))}
+            </Box>
+          </Paper>
+        )}
         
         <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
           <TextField
