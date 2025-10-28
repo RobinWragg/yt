@@ -18,6 +18,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
@@ -51,6 +55,8 @@ export default function Table() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelId, setChannelId] = useState("");
   const [channels, setChannels] = useState<string[]>([]);
+  const [selectedChannelToDelete, setSelectedChannelToDelete] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   async function refreshEntries() {
     try {
@@ -173,6 +179,25 @@ export default function Table() {
     }
   }
 
+  function handleDeleteChannelSelect(channelId: string) {
+    if (channelId) {
+      setSelectedChannelToDelete(channelId);
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  function handleDeleteDialogClose() {
+    setIsDeleteDialogOpen(false);
+    setSelectedChannelToDelete("");
+  }
+
+  async function handleConfirmDelete() {
+    if (selectedChannelToDelete) {
+      await onDeleteChannel(selectedChannelToDelete);
+      handleDeleteDialogClose();
+    }
+  }
+
   function handleModalClose() {
     setIsModalOpen(false);
     setChannelId("");
@@ -221,32 +246,25 @@ export default function Table() {
             <Typography variant="h6" gutterBottom>
               Channels ({channels.length})
             </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {channels.map((channel) => (
-                <Box
-                  key={channel}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 2,
-                    py: 1,
-                    backgroundColor: "action.hover",
-                    borderRadius: 1,
-                  }}
-                >
-                  <Typography variant="body2">{channel}</Typography>
-                  <IconButton
-                    size="small"
-                    aria-label="delete channel"
-                    onClick={() => onDeleteChannel(channel)}
-                    sx={{ ml: 1 }}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </Box>
-              ))}
-            </Box>
+            <FormControl fullWidth>
+              <InputLabel id="delete-channel-label">Select channel to delete</InputLabel>
+              <Select
+                labelId="delete-channel-label"
+                id="delete-channel-select"
+                value=""
+                label="Select channel to delete"
+                onChange={(e) => handleDeleteChannelSelect(e.target.value)}
+              >
+                <MenuItem value="" disabled>
+                  Select a channel...
+                </MenuItem>
+                {channels.map((channel) => (
+                  <MenuItem key={channel} value={channel}>
+                    {channel}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Paper>
         )}
         
@@ -341,6 +359,34 @@ export default function Table() {
             </Typography>
           </Box>
         )}
+
+        {/* Delete Channel Confirmation Dialog */}
+        <Dialog
+          open={isDeleteDialogOpen}
+          onClose={handleDeleteDialogClose}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Confirm Channel Deletion</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete the channel "{selectedChannelToDelete}"?
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              This will also delete all videos associated with this channel.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+            <Button 
+              onClick={handleConfirmDelete} 
+              variant="contained"
+              color="error"
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Add Channel Modal */}
         <Dialog 
