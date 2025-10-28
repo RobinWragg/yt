@@ -170,13 +170,13 @@ pub fn delete_channel(channel_id: &str) -> Result<(), Box<dyn Error>> {
         
         // First delete all videos associated with the channel
         sqlx::query("DELETE FROM videos WHERE channel_id=$1;")
-            .bind(channel_id)
+            .bind(&channel_id)
             .execute(&mut *tx)
             .await?;
 
         // Then delete the channel itself
         sqlx::query("DELETE FROM channels WHERE channel_id=$1;")
-            .bind(channel_id)
+            .bind(&channel_id)
             .execute(&mut *tx)
             .await?;
 
