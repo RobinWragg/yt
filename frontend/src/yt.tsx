@@ -18,6 +18,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Delete, Add } from "@mui/icons-material";
 
@@ -50,6 +54,9 @@ export default function Table() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [channelId, setChannelId] = useState("");
+  const [channels, setChannels] = useState<string[]>([]);
+  const [selectedChannelToDelete, setSelectedChannelToDelete] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   async function refreshEntries() {
     try {
@@ -66,9 +73,25 @@ export default function Table() {
     }
   }
 
+  async function refreshChannels() {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8080/api/all_channel_ids"
+      );
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      setChannels(await response.json());
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   // Request data to populate the table with.
   useEffect(() => {
     refreshEntries();
+    refreshChannels();
   }, []);
 
   async function onClickDelete(entryId: string) {
@@ -123,11 +146,55 @@ export default function Table() {
       setIsModalOpen(false);
       setChannelId("");
       
-      // Optionally refresh entries to show new data
-      // refreshEntries();
+      // Refresh channels list to show new channel
+      refreshChannels();
     } catch (error) {
       console.error("Failed to add channel:", error);
       // You could add user-facing error handling here
+    }
+  }
+
+  async function onDeleteChannel(channelIdToDelete: string) {
+    try {
+      const response = await fetch("http://127.0.0.1:8080/api/delete_channel", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          channel_id: channelIdToDelete,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      // Refresh both channels and videos after deletion
+      refreshChannels();
+      refreshEntries();
+    } catch (error) {
+      console.error("Failed to delete channel:", error);
+    }
+  }
+
+  function handleDeleteChannelSelect(channelId: string) {
+    if (channelId) {
+      setSelectedChannelToDelete(channelId);
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  function handleDeleteDialogClose() {
+    setIsDeleteDialogOpen(false);
+    setSelectedChannelToDelete("");
+  }
+
+  async function handleConfirmDelete() {
+    if (selectedChannelToDelete) {
+      await onDeleteChannel(selectedChannelToDelete);
+      handleDeleteDialogClose();
     }
   }
 
@@ -172,6 +239,34 @@ export default function Table() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           YouTube Videos ({entries.length})
         </Typography>
+
+        {/* Channels Section */}
+        {channels.length > 0 && (
+          <Paper elevation={3} sx={{ mb: 3, p: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Channels ({channels.length})
+            </Typography>
+            <FormControl fullWidth>
+              <InputLabel id="delete-channel-label">Select channel to delete</InputLabel>
+              <Select
+                labelId="delete-channel-label"
+                id="delete-channel-select"
+                value=""
+                label="Select channel to delete"
+                onChange={(e) => handleDeleteChannelSelect(e.target.value)}
+              >
+                <MenuItem value="" disabled>
+                  Select a channel...
+                </MenuItem>
+                {channels.map((channel) => (
+                  <MenuItem key={channel} value={channel}>
+                    {channel}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Paper>
+        )}
         
         <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
           <TextField
@@ -264,6 +359,34 @@ export default function Table() {
             </Typography>
           </Box>
         )}
+
+        {/* Delete Channel Confirmation Dialog */}
+        <Dialog
+          open={isDeleteDialogOpen}
+          onClose={handleDeleteDialogClose}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Confirm Channel Deletion</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete the channel "{selectedChannelToDelete}"?
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              This will also delete all videos associated with this channel.
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+            <Button 
+              onClick={handleConfirmDelete} 
+              variant="contained"
+              color="error"
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Add Channel Modal */}
         <Dialog 

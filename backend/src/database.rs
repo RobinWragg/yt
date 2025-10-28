@@ -164,25 +164,30 @@ pub fn select_all_channel_ids_as_json() -> Result<String, Box<dyn Error>> {
 pub fn delete_channel(channel_id: &str) -> Result<(), Box<dyn Error>> {
     let mut connection = open_connection();
 
-    // First delete all videos associated with the channel
-    let delete_videos_query = sqlx::query("DELETE FROM videos WHERE channel_id=$1;")
-        .bind(&channel_id)
-        .execute(&mut connection);
+    // Use a transaction to ensure atomicity - both operations succeed or both fail
+    let transaction = futures::executor::block_on(async {
+        let mut tx = connection.begin().await?;
+        
+        // First delete all videos associated with the channel
+        sqlx::query("DELETE FROM videos WHERE channel_id=$1;")
+            .bind(&channel_id)
+            .execute(&mut *tx)
+            .await?;
 
-    if let Err(e) = futures::executor::block_on(delete_videos_query) {
-        return Err(Box::new(e));
+        // Then delete the channel itself
+        sqlx::query("DELETE FROM channels WHERE channel_id=$1;")
+            .bind(&channel_id)
+            .execute(&mut *tx)
+            .await?;
+
+        tx.commit().await?;
+        Ok::<(), sqlx::Error>(())
+    });
+
+    match transaction {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Box::new(e)),
     }
-
-    // Then delete the channel itself
-    let delete_channel_query = sqlx::query("DELETE FROM channels WHERE channel_id=$1;")
-        .bind(&channel_id)
-        .execute(&mut connection);
-
-    if let Err(e) = futures::executor::block_on(delete_channel_query) {
-        return Err(Box::new(e));
-    }
-
-    Ok(())
 }
 
 fn select_all_table_names() -> Result<Vec<String>, Box<dyn Error>> {
